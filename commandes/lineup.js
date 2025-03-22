@@ -1,4 +1,3 @@
-/*
 const { zokou } = require("../framework/zokou");
 const { saveUser, getUserData, updatePlayers, updateStats, resetStats } = require("../bdd/lineup_db");
 
@@ -110,4 +109,3 @@ async function stats_lineup(tex, repondre) {
 }
 
 module.exports = stats_lineup;
-*/
