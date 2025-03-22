@@ -67,7 +67,7 @@ zokou(
     const { repondre, arg } = commandeOptions;
     const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!mention || arg.length < 2) {
-      return repondre("⚠️ Mentionne un utilisateur et ajoute son nom.");
+      return //repondre("⚠️ Mentionne un utilisateur et ajoute son nom.");
     }
     const userId = mention;
     const nomJoueur = arg.slice(1).join(" ");
@@ -88,7 +88,7 @@ async function stats_lineup(tex, repondre) {
     const valeur = parseInt(texte[3], 10);
     
     if (isNaN(valeur) || (signe !== "+" && signe !== "-")) {
-      return repondre("⚠️ Valeur incorrecte. Exemple: `@user j1 + 30` ou `@user j1 - 30`");
+      return //repondre("⚠️ Valeur incorrecte. Exemple: `@user j1 + 30` ou `@user j1 - 30`");
     }
 
     const updateMessage = await updateStats(userId, joueurKey, signe, valeur);
@@ -104,7 +104,7 @@ async function stats_lineup(tex, repondre) {
   } 
 
   else {
-    return repondre("⚠️ Format incorrect. Utilise : `@user j1 + 30`, `@user j1 - 30` ou `@user reset_stats`");
+    return //repondre("⚠️ Format incorrect. Utilise : `@user j1 + 30`, `@user j1 - 30` ou `@user reset_stats`");
   }
 }
 
