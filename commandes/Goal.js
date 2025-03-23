@@ -131,3 +131,5 @@ async function goal (zk, dest, repondre, texte) {
     }
   }
 );
+
+module.exports = goal;
