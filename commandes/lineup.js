@@ -82,30 +82,29 @@ async function stats_lineup(tex, repondre) {
 
   if (texte.length === 4 && texte[0].startsWith("@")) {
     const userId = `${texte[0].replace("@", "")}@s.whatsapp.net`;
-    const joueurKey = `stat${texte[1].replace("j", "")}`; // Convertit "j1" en "stat1"
-    
-    const signe = texte[2]; // Récupère le signe
+    const joueurKey = texte[1].toLowerCase();
+
+    if (!/^j\d+$/.test(joueurKey)) return null;
+
+    const statKey = `stat${joueurKey.replace("j", "")}`;
+    const signe = texte[2];
     const valeur = parseInt(texte[3], 10);
-    
-    if (isNaN(valeur) || (signe !== "+" && signe !== "-")) {
-      return //repondre("⚠️ Valeur incorrecte. Exemple: `@user j1 + 30` ou `@user j1 - 30`");
+
+    if (isNaN(valeur) || valeur <= 0 || (signe !== "+" && signe !== "-")) {
+      return null;
     }
 
-    const updateMessage = await updateStats(userId, joueurKey, signe, valeur);
-
+    const updateMessage = await updateStats(userId, statKey, signe, valeur);
     return repondre(updateMessage);
   }  
 
-  // 📌 Gestion de la commande reset_stats
   else if (texte.length === 2 && texte[1] === "reset_stats" && texte[0].startsWith("@")) {
     const userId = texte[0].replace("@", "") + "@s.whatsapp.net";
     const resetMessage = await resetStats(userId);
     return repondre(resetMessage);
   } 
 
-  else {
-    return //repondre("⚠️ Format incorrect. Utilise : `@user j1 + 30`, `@user j1 - 30` ou `@user reset_stats`");
-  }
+  return null;
 }
 
 module.exports = stats_lineup;
