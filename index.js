@@ -217,7 +217,7 @@ async function main() {
         latence({zk, texte, origineMessage});
         stats(texte, repondre);
         stats_lineup(texte, repondre);
-        goal(zk, dest, repondre, texte);
+        goal(zk, origineMessage, repondre, texte);
 
 
             }); //fin evenement message
