@@ -1,4 +1,3 @@
-
 async function goal (zk, dest, repondre, texte) {
     if (!texte.toLowerCase().startsWith("🔷⚽duel action de but🥅\n▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔")) {
       return;
@@ -88,7 +87,7 @@ async function goal (zk, dest, repondre, texte) {
                 let imageMessage = await zk.sendMessage(dest, { text: frames[0] });
 
                 for (let i = 1; i < frames.length; i++) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                     await zk.sendMessage(dest, {
                         text: frames[i],
                         edit: imageMessage.key,
