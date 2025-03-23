@@ -83,8 +83,6 @@ async function goal (zk, dest, repondre, texte) {
                 "▰▰▰▰▰▰▰▰▰▱ 🔷90%",
                 "▰▰▰▰▰▰▰▰▰▰ 🔷100%",
             ];
-
-            try {
                 let imageMessage = await zk.sendMessage(dest, { text: frames[0] });
 
                 for (let i = 1; i < frames.length; i++) {
@@ -129,7 +127,6 @@ async function goal (zk, dest, repondre, texte) {
 
       await zk.sendMessage(dest, { image: { url: videosArret }, caption: messageArret });
     }
-  }
-);
+}
 
 module.exports = goal;
