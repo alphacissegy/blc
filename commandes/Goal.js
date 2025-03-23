@@ -112,7 +112,7 @@ async function goal (zk, dest, repondre, texte) {
       ];
       const videosBut = videosBute[Math.floor(Math.random() * videosBute.length)];
 
-      await zk.sendMessage(dest, { image: { url: videosBut }, caption: messageBut });
+      await zk.sendMessage(dest, { video: { url: videosBut }, caption: messageBut, gifPlayback: true });
     } else if (resultat === "arrêt") {
       const messagesArret = [
         "🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien boxe le ballon⚽ à l'extérieur, Sortie de BUT !",
@@ -127,7 +127,7 @@ async function goal (zk, dest, repondre, texte) {
       ];
       const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
 
-      await zk.sendMessage(dest, { image: { url: videosArret }, caption: messageArret });
+      await zk.sendMessage(dest, { video: { url: videosArret }, caption: messageArret, gifPlayback: true });
     }
 }
 
