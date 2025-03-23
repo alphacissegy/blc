@@ -16,6 +16,7 @@ const latence = require('./commandes/decompte');
 const stats = require('./commandes/stats');
 const loca_test = require('./Elysium/FA');
 const stats_lineup = require('./commandes/lineup');
+const goal = require('./commandes/Goal');
 
 async function ovlAuth(session) {
     let sessionId;
@@ -216,6 +217,7 @@ async function main() {
         latence({zk, texte, origineMessage});
         stats(texte, repondre);
         stats_lineup(texte, repondre);
+        goal(zk, dest, repondre, texte);
 
 
             }); //fin evenement message
