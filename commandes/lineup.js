@@ -1,5 +1,5 @@
 const { zokou } = require("../framework/zokou");
-const { saveUser, getUserData, updatePlayers, updateStats, resetStats } = require("../bdd/lineup_db");
+const { saveUser, deleteUser, getUserData, updatePlayers, updateStats, resetStats } = require("../bdd/lineup_db");
 
 zokou(
   {
