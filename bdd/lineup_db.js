@@ -45,6 +45,22 @@ async function saveUser(id, nom) {
   }
 }
 
+async function deleteUser(id) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("DELETE FROM blue_lock_stats WHERE id = $1 RETURNING *", [id]);
+    if (result.rowCount > 0) {
+      return "✅ Joueur supprimé avec succès.";
+    }
+    return "⚠️ Joueur introuvable.";
+  } catch (error) {
+    console.error("❌ Erreur lors de la suppression:", error);
+    return "❌ Une erreur est survenue lors de la suppression.";
+  } finally {
+    client.release();
+  }
+}
+
 // 📌 Récupération des données d'un joueur
 async function getUserData(id) {
   const client = await pool.connect();
@@ -123,6 +139,7 @@ async function resetStats(userId) {
 
 module.exports = {
   saveUser,
+  deleteUser,
   getUserData,
   updatePlayers,
   updateStats,
