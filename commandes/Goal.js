@@ -1,11 +1,5 @@
-zokou(
-  {
-    nomCom: "Goal",
-    categorie: "Gestion",
-  },
-  async (dest, zk, commandeOptions) => {
-    const { repondre, texte } = commandeOptions;
 
+async function goal (zk, dest, repondre, texte) {
     if (!texte.toLowerCase().startsWith("🔷⚽duel action de but🥅\n▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔")) {
       return;
     }
@@ -43,8 +37,6 @@ zokou(
       resultat = "arrêt";
     } else if (distance > 2.00) {
       resultat = "arrêt";
-    } else if (distance >= 1.70 && distance <= 2.00) {
-      resultat = statsTir > reflexes ? "but" : "arrêt";
     } else if (distance <= 5) {
       const difference = statsTir - reflexes;
       if (difference < -5) {
@@ -58,7 +50,9 @@ zokou(
       } else if (difference > 5) {
         resultat = "but";
       }
-    } else if (distance > 5 && distance <= 10) {
+      } else if (distance >= 1.70 && distance <= 2.00) {
+      resultat = statsTir > reflexes ? "but" : "arrêt";
+      } else if (distance > 5 && distance <= 10) {
       const difference = statsTir - vitesse;
       if (difference < -5) {
         resultat = "arrêt";
@@ -77,23 +71,29 @@ zokou(
     }
 
     const frames = [
-      "▱▱▱▱▱▱▱▱▱▱ 🔷0%",
-      "▰▱▱▱▱▱▱▱▱▱ 🔷10%",
-      "▰▰▱▱▱▱▱▱▱▱ 🔷20%",
-      "▰▰▰▱▱▱▱▱▱▱ 🔷30%",
-      "▰▰▰▰▱▱▱▱▱▱ 🔷40%",
-      "▰▰▰▰▰▱▱▱▱▱ 🔷50%",
-      "▰▰▰▰▰▰▱▱▱▱ 🔷60%",
-      "▰▰▰▰▰▰▰▱▱▱ 🔷70%",
-      "▰▰▰▰▰▰▰▰▱▱ 🔷80%",
-      "▰▰▰▰▰▰▰▰▰▱ 🔷90%",
-      "▰▰▰▰▰▰▰▰▰▰ 🔷100%",
-    ];
+                "▱▱▱▱▱▱▱▱▱▱ 🔷0%",
+                "▰▱▱▱▱▱▱▱▱▱ 🔷10%",
+                "▰▰▱▱▱▱▱▱▱▱ 🔷20%",
+                "▰▰▰▱▱▱▱▱▱▱ 🔷30%",
+                "▰▰▰▰▱▱▱▱▱▱ 🔷40%",
+                "▰▰▰▰▰▱▱▱▱▱ 🔷50%",
+                "▰▰▰▰▰▰▱▱▱▱ 🔷60%",
+                "▰▰▰▰▰▰▰▱▱▱ 🔷70%",
+                "▰▰▰▰▰▰▰▰▱▱ 🔷80%",
+                "▰▰▰▰▰▰▰▰▰▱ 🔷90%",
+                "▰▰▰▰▰▰▰▰▰▰ 🔷100%",
+            ];
 
-    for (let i = 0; i < frames.length; i++) {
-      await repondre(frames[i]);
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Délai de 500ms entre chaque frame
-    }
+            try {
+                let imageMessage = await zk.sendMessage(dest, { text: frames[0] });
+
+                for (let i = 1; i < frames.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await zk.sendMessage(dest, {
+                        text: frames[i],
+                        edit: imageMessage.key,
+                    });
+                }
 
     if (resultat === "but") {
       let messageBut;
@@ -105,12 +105,12 @@ zokou(
         messageBut = `🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱\nBut magnifique dans la ${zone} !`;
       }
 
-      const videosBut = [
+      const videosBute = [
         "https://files.catbox.moe/chcn2d.mp4",
         "https://files.catbox.moe/t04dmz.mp4",
         "https://files.catbox.moe/8t1eya.mp4",
       ];
-      const videosBut = videosBut[Math.floor(Math.random() * videosBut.length)];
+      const videosBut = videosBute[Math.floor(Math.random() * videosBut.length)];
 
       await zk.sendMessage(dest, { image: { url: videosBut }, caption: messageBut });
     } else if (resultat === "arrêt") {
@@ -122,10 +122,10 @@ zokou(
       ];
       const messageArret = messagesArret[Math.floor(Math.random() * messagesArret.length)];
 
-      const videosArret = [
+      const videosArrete = [
         "https://files.catbox.moe/88lylr.mp4",
       ];
-      const videosArret = videosArret[Math.floor(Math.random() * videosArret.length)];
+      const videosArret = videosArrete[Math.floor(Math.random() * videosArret.length)];
 
       await zk.sendMessage(dest, { image: { url: videosArret }, caption: messageArret });
     }
