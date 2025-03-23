@@ -15,15 +15,15 @@ zokou(
     if (arg.length <= 1) {
       const lineup = `🥅⚽LINEUP: ${data.nom}
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-1 👤${data.joueur1} : ${data.stat1}%🫀
-2 👤${data.joueur2} : ${data.stat2}%🫀
-3 👤${data.joueur3} : ${data.stat3}%🫀
-4 👤${data.joueur4} : ${data.stat4}%🫀
-5 👤${data.joueur5} : ${data.stat5}%🫀
-6 👤${data.joueur6} : ${data.stat6}%🫀
-7 👤${data.joueur7} : ${data.stat7}%🫀
-8 👤${data.joueur8} : ${data.stat8}%🫀
-9 👤${data.joueur9} : ${data.stat9}%🫀
+1 👤(AG) ${data.joueur1} : ${data.stat1}%🫀
+2 👤(AC) ${data.joueur2} : ${data.stat2}%🫀
+3 👤(AD) ${data.joueur3} : ${data.stat3}%🫀
+4 👤(MG) ${data.joueur4} : ${data.stat4}%🫀
+5 👤(MC) ${data.joueur5} : ${data.stat5}%🫀
+6 👤(MD) ${data.joueur6} : ${data.stat6}%🫀
+7 👤(DG) ${data.joueur7} : ${data.stat7}%🫀
+8 👤(DC) ${data.joueur8} : ${data.stat8}%🫀
+9 👤(DD) ${data.joueur9} : ${data.stat9}%🫀
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 *REMPLAÇANTS🥅*:
 10 👤${data.joueur10}
@@ -64,14 +64,35 @@ zokou(
     categorie: "Gestion",
   },
   async (dest, zk, commandeOptions) => {
-    const { repondre, arg } = commandeOptions;
+    const { repondre, arg, superUser } = commandeOptions;
+    if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent enregistrer un joueur.");
+
     const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!mention || arg.length < 2) {
-      return //repondre("⚠️ Mentionne un utilisateur et ajoute son nom.");
+      return repondre("⚠️ Mentionne un utilisateur et ajoute son nom.");
     }
     const userId = mention;
     const nomJoueur = arg.slice(1).join(" ");
     const message = await saveUser(userId, nomJoueur);
+    repondre(message);
+  }
+);
+
+zokou(
+  {
+    nomCom: "delete",
+    categorie: "Gestion",
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre, arg, superUser } = commandeOptions;
+    if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent supprimer un joueur.");
+
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    if (!mention) {
+      return repondre("⚠️ Mentionne un utilisateur à supprimer.");
+    }
+    const userId = mention;
+    const message = await deleteUser(userId);
     repondre(message);
   }
 );
