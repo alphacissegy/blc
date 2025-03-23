@@ -159,6 +159,7 @@ async function main() {
                     verifOvlAdmin,
                     prefixe,
                     arg,
+                    texte,
                     repondre,
                     groupeAdmin,
                     msgRepondu,
