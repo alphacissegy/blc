@@ -4,10 +4,9 @@ zokou(
     categorie: "Gestion",
   },
   async (dest, zk, commandeOptions) => {
-    const { repondre, msg } = commandeOptions;
-    const texte = msg.body.trim();
+    const { repondre, texte } = commandeOptions;
 
-    if (!texte.startsWith("🔷⚽duel action de but🥅\n▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔")) {
+    if (!texte.toLowerCase().startsWith("🔷⚽duel action de but🥅\n▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔")) {
       return;
     }
 
