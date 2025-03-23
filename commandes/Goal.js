@@ -4,13 +4,13 @@ async function goal (zk, dest, repondre, texte) {
       return;
     }
 
-    const tirMatch = texte.match(/🥅tir\s*=\s*(\d+)/);
-    const reflexesMatch = texte.match(/🥅reflexes\s*=\s*(\d+)/);
-    const vitesseMatch = texte.match(/🥅vitesse\s*=\s*(\d+)/);
-    const zoneMatch = texte.match(/🥅zone\s*=\s*([\w\s]+)/);
-    const distanceMatch = texte.match(/🥅distance\s*=\s*([\d.]+)m/);
-    const staminaMatch = texte.match(/🥅stamina\s*=\s*(\d+)%/);
-    const placementMatch = texte.match(/🥅placement\s*=\s*(\w+)/);
+    const tirMatch = texte.toLowerCase().match(/🥅tir\s*=\s*(\d+)/);
+    const reflexesMatch = texte.toLowerCase().match(/🥅reflexes\s*=\s*(\d+)/);
+    const vitesseMatch = texte.toLowerCase().match(/🥅vitesse\s*=\s*(\d+)/);
+    const zoneMatch = texte.toLowerCase().match(/🥅zone\s*=\s*([\w\s]+)/);
+    const distanceMatch = texte.toLowerCase().match(/🥅distance\s*=\s*([\d.]+)m/);
+    const staminaMatch = texte.toLowerCase().match(/🥅stamina\s*=\s*(\d+)%/);
+    const placementMatch = texte.toLowerCase().match(/🥅placement\s*=\s*(\w+)/);
 
     if (!tirMatch || !reflexesMatch || !vitesseMatch || !zoneMatch || !distanceMatch || !staminaMatch || !placementMatch) {
       return repondre("⚠️ Format incorrect. Assure-toi que la fiche est bien formatée.");
@@ -108,7 +108,7 @@ async function goal (zk, dest, repondre, texte) {
         "https://files.catbox.moe/t04dmz.mp4",
         "https://files.catbox.moe/8t1eya.mp4",
       ];
-      const videosBut = videosBute[Math.floor(Math.random() * videosBut.length)];
+      const videosBut = videosBute[Math.floor(Math.random() * videosBute.length)];
 
       await zk.sendMessage(dest, { image: { url: videosBut }, caption: messageBut });
     } else if (resultat === "arrêt") {
@@ -123,7 +123,7 @@ async function goal (zk, dest, repondre, texte) {
       const videosArrete = [
         "https://files.catbox.moe/88lylr.mp4",
       ];
-      const videosArret = videosArrete[Math.floor(Math.random() * videosArret.length)];
+      const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
 
       await zk.sendMessage(dest, { image: { url: videosArret }, caption: messageArret });
     }
