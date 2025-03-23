@@ -9,6 +9,7 @@ async function goal (zk, dest, repondre, texte) {
     const vitesseMatch = texte.toLowerCase().match(/🥅vitesse\s*=\s*(\d+)/);
     const zoneMatch = texte.toLowerCase().match(/🥅zone\s*=\s*([\w\s]+)/);
     const distanceMatch = texte.toLowerCase().match(/🥅distance\s*=\s*([\d.]+)m/);
+    const hauteurMatch = texte.toLowerCase().match(/🥅Hauteur\s*=\s*([\d.]+)m/);
     const staminaMatch = texte.toLowerCase().match(/🥅stamina\s*=\s*(\d+)%/);
     const placementMatch = texte.toLowerCase().match(/🥅placement\s*=\s*(\w+)/);
 
@@ -21,6 +22,7 @@ async function goal (zk, dest, repondre, texte) {
     const vitesse = parseInt(vitesseMatch[1], 10);
     const zone = zoneMatch[1].trim();
     const distance = parseFloat(distanceMatch[1]);
+    const hauteur = parseFloat(hauteurMatch[1]);
     const stamina = parseInt(staminaMatch[1], 10);
     const placement = placementMatch[1].toLowerCase();
 
@@ -33,9 +35,9 @@ async function goal (zk, dest, repondre, texte) {
 
     let resultat;
 
-    if (distance < 1.70) {
+    if (hauteur < 1.70) {
       resultat = "arrêt";
-    } else if (distance > 2.00) {
+    } else if (hauteur > 2.00) {
       resultat = "arrêt";
     } else if (distance <= 5) {
       const difference = statsTir - reflexes;
