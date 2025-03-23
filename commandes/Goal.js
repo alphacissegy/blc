@@ -9,7 +9,7 @@ async function goal (zk, dest, repondre, texte) {
     const vitesseMatch = texte.toLowerCase().match(/🥅vitesse\s*=\s*(\d+)/);
     const zoneMatch = texte.toLowerCase().match(/🥅zone\s*=\s*([\w\s]+)/);
     const distanceMatch = texte.toLowerCase().match(/🥅distance\s*=\s*([\d.]+)m/);
-    const hauteurMatch = texte.toLowerCase().match(/🥅Hauteur\s*=\s*([\d.]+)m/);
+    const hauteurMatch = texte.toLowerCase().match(/🥅hauteur\s*=\s*([\d.]+)m/);
     const staminaMatch = texte.toLowerCase().match(/🥅stamina\s*=\s*(\d+)%/);
     const placementMatch = texte.toLowerCase().match(/🥅placement\s*=\s*(\w+)/);
 
