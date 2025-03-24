@@ -1,6 +1,6 @@
 const map_fa = [
     { km: 48, lieu: "Av. Kings `[Museum🗿]`", image: "https://files.catbox.moe/pq36ml.jpg" },
-    { km: 47, lieu: "Av. Federal `[NC Bank🏦]`", image: "https://files.catbox.moe/ip1zib.jpg" },
+    { km: 47, lieu: "Av. Federal `[NC Bank🏦]`", image: "https://example.com/images/bank.jpg" },
     { km: 46, lieu: "Av. Collins `[Parking🚘]`", image: "https://example.com/images/parking.jpg" },
     { km: 45, lieu: "Av. Telsa `[Metro🚄]`", image: "https://example.com/images/metro.jpg" },
     { km: 44, lieu: "Av. Fain `[GrandHôtel🏨]`", image: "https://example.com/images/hotel.jpg" },
