@@ -51,7 +51,7 @@ const map_fa = [
 
 let lastPosition = null;
 
-function loca_test({ texte, repondre }) {
+function loca_test({ texte, repondre, zk, dest }) {
     const normalizedText = typeof texte === 'string' ? texte.toLowerCase() : '';
     const commandPattern = "*`💠i n t e r f a c e`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n🌍position:".toLowerCase();
 
@@ -87,10 +87,10 @@ function loca_test({ texte, repondre }) {
             const message = `*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`;
 
             if (endLocation && endLocation.image) {
-                return repondre(
-                    { text: message },
-                    { image: { url: endLocation.image } }
-                );
+                return zk.sendMessage(dest, {
+                    image: { url: endLocation.image },
+                    caption: message
+                });
             } else {
                 return repondre(message);
             }
