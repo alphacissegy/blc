@@ -14,7 +14,7 @@ const prefixe = conf.PREFIXE || "/";
 //const maine = require('./commandes/elysium_control_bot');
 const latence = require('./commandes/decompte');
 const stats = require('./commandes/stats');
-const loca_test = require('./Elysium/FA');
+const loca_test = require('./Elysium/Fallen_Angels/FA');
 const stats_lineup = require('./commandes/lineup');
 const goal = require('./commandes/Goal');
 
