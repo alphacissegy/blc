@@ -48,53 +48,53 @@ const map_fa = [
     { km: 2, lieu: "La Marina🌴 `[TheBay🏖️]`", image: "https://example.com/images/marina.jpg" },
     { km: 1, lieu: "Long Beach🌴 `[Plage🚤]`", image: "https://example.com/images/beach.jpg" }
 ];
-
 let lastPosition = null;
 
 function loca_test({ texte, repondre, zk, dest }) {
-    const normalizedText = typeof texte === 'string' ? texte.toLowerCase() : '';
-    const commandPattern = "*`💠i n t e r f a c e`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n🌍position:".toLowerCase();
+    if (typeof texte !== 'string') return;
 
-    if (normalizedText.startsWith(commandPattern)) {
-        const regex = /🌍position:\s*(\d+)km\s*([>]{1,2})\s*(\d+)km/i;
-        const match = texte.match(regex);
+    const normalizedText = texte.toLowerCase();
+    const commandPattern = `*\`💠i n t e r f a c e\`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n🌍position:`;
 
-        if (match) {
-            const startPosition = parseInt(match[1], 10);
-            const guillemets = match[2];
-            const endPosition = parseInt(match[3], 10);
+    if (!normalizedText.startsWith(commandPattern)) return;
 
-            if (startPosition === endPosition) {
-                const currentLocation = map_fa.find(loc => loc.km === startPosition);
-                const lieu = currentLocation ? currentLocation.lieu : "Position inconnue";
-                return repondre(`*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Position inchangée, vous êtes toujours à «${lieu}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`);
-            }
+    const regex = /🌍position:\s*(\d+)km\s*(>{1,2})\s*(\d+)km/i;
+    const match = texte.match(regex);
 
-            const distance = Math.abs(endPosition - startPosition);
+    if (!match) return;
 
-            if (guillemets === ">" && distance > 1) {
-                return repondre("*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance à pied 🚶‍♂️! Le maximum de Km à pieds est de 1km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
-            } else if (guillemets === ">>" && distance > 4) {
-                return repondre("*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance en voiture 🚗! Le maximum de Km en voiture est de 4km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
-            }
+    const startPosition = parseInt(match[1], 10);
+    const direction = match[2];
+    const endPosition = parseInt(match[3], 10);
 
-            let startLocation = map_fa.find(loc => loc.km === startPosition);
-            let endLocation = map_fa.find(loc => loc.km === endPosition);
+    if (startPosition === endPosition) {
+        const lieu = map_fa.find(loc => loc.km === startPosition)?.lieu || "Position inconnue";
+        return repondre(`*💠S Y S T È ME🌐*\n📍Position inchangée, vous êtes toujours à «${lieu}»`);
+    }
 
-            let startName = startLocation ? startLocation.lieu : "Lieu inconnu";
-            let endName = endLocation ? endLocation.lieu : "Lieu inconnu";
+    const distance = Math.abs(endPosition - startPosition);
+    const maxDistance = direction === ">" ? 1 : 4;
 
-            const message = `*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`;
+    if (distance > maxDistance) {
+        const transport = direction === ">" ? "🚶‍♂️ à pied (1km max)" : "🚗 en voiture (4km max)";
+        return repondre(`*💠S Y S T È ME🌐*\n▪️Vous ne pouvez pas parcourir autant de distance ${transport} !`);
+    }
 
-            if (endLocation && endLocation.image) {
-                return zk.sendMessage(dest, {
-                    image: { url: endLocation.image },
-                    caption: message
-                });
-            } else {
-                return repondre(message);
-            }
-        }
+    const startLocation = map_fa.find(loc => loc.km === startPosition);
+    const endLocation = map_fa.find(loc => loc.km === endPosition);
+
+    const startName = startLocation?.lieu || "Lieu inconnu";
+    const endName = endLocation?.lieu || "Lieu inconnu";
+
+    const message = `*💠S Y S T È ME🌐*\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»`;
+
+    if (endLocation?.image) {
+        return zk.sendMessage(dest, {
+            image: { url: endLocation.image },
+            caption: message
+        });
+    } else {
+        return repondre(message);
     }
 }
 
