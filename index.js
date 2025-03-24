@@ -213,7 +213,7 @@ async function main() {
 
           const params = { zk, texte, origineMessage, repondre, ms };
       //  maine(params);
-        loca_test({texte, repondre});
+        loca_test({texte, repondre, zk, dest});
         latence({zk, texte, origineMessage});
         stats(texte, repondre);
         stats_lineup(texte, repondre);
