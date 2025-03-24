@@ -1,6 +1,6 @@
 const map_fa = [
     { km: 48, lieu: "Av. Kings `[Museum🗿]`", image: "https://files.catbox.moe/pq36ml.jpg" },
-    { km: 47, lieu: "Av. Federal `[NC Bank🏦]`", image: "https://example.com/images/bank.jpg" },
+    { km: 47, lieu: "Av. Federal `[NC Bank🏦]`", image: "https://files.catbox.moe/ip1zib.jpg" },
     { km: 46, lieu: "Av. Collins `[Parking🚘]`", image: "https://example.com/images/parking.jpg" },
     { km: 45, lieu: "Av. Telsa `[Metro🚄]`", image: "https://example.com/images/metro.jpg" },
     { km: 44, lieu: "Av. Fain `[GrandHôtel🏨]`", image: "https://example.com/images/hotel.jpg" },
@@ -52,48 +52,52 @@ const map_fa = [
 let lastPosition = null;
 
 function loca_test({ texte, repondre }) {
-    if (typeof texte === "string" && texte.toLowerCase().startsWith("*`💠i n t e r f a c e`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n🌍position:")) {
-        
+    const normalizedText = typeof texte === 'string' ? texte.toLowerCase() : '';
+    const commandPattern = "*`💠i n t e r f a c e`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n🌍position:".toLowerCase();
+
+    if (normalizedText.startsWith(commandPattern)) {
         const regex = /🌍position:\s*(\d+)km\s*([>]{1,2})\s*(\d+)km/i;
-        const match = texte.match(regex);
+        const match = normalizedText.match(regex);
 
         if (match) {
             const startPosition = parseInt(match[1], 10);
             const guillemets = match[2];
             const endPosition = parseInt(match[3], 10);
 
-            const distance = Math.abs(endPosition - startPosition);
-
-            // Vérifie les limites de distance
-            if (guillemets === ">" && distance > 1) {
-                repondre("*`💠S Y S T È ME🌐`*▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■▪️Vous ne pouvez pas parcourir autant de distance à pied 🚶‍♂️! Le maximum de Km à pieds est de 1km Max !■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
-                return;
-            } else if (guillemets === ">>" && distance > 4) {
-                repondre("*`💠S Y S T È ME🌐`*▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■▪️Vous ne pouvez pas parcourir autant de distance en voiture 🚗! Le maximum de Km en voiture est de 4km Max !■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
+            if (startPosition === endPosition) {
+                const currentLocation = map_fa.find(loc => loc.km === startPosition);
+                const lieu = currentLocation ? currentLocation.lieu : "Position inconnue";
+                repondre(`*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Position inchangée, vous êtes toujours à «${lieu}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`);
                 return;
             }
 
-            // Trouve les lieux de départ et d'arrivée
+            const distance = Math.abs(endPosition - startPosition);
+
+            if (guillemets === ">" && distance > 1) {
+                repondre("*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance à pied 🚶‍♂️! Le maximum de Km à pieds est de 1km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
+                return;
+            } else if (guillemets === ">>" && distance > 4) {
+                repondre("*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance en voiture 🚗! Le maximum de Km en voiture est de 4km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
+                return;
+            }
+
             let startLocation = map_fa.find(loc => loc.km === startPosition);
             let endLocation = map_fa.find(loc => loc.km === endPosition);
 
             let startName = startLocation ? startLocation.lieu : "Lieu inconnu";
             let endName = endLocation ? endLocation.lieu : "Lieu inconnu";
 
-            // Message de localisation
-            const message = `📍 Départ : *${startName}*\n📍 Arrivée : *${endName}*`;
+            const message = `*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`;
 
-            // Envoie le message et l'image
             if (endLocation && endLocation.image) {
                 repondre({
                     text: message,
-                    image: endLocation.image,
+                    image: { url: endLocation.image }
                 });
             } else {
-                repondre(message); // Envoie uniquement le message si l'image est manquante
+                repondre(message);
             }
 
-            // Met à jour la dernière position
             lastPosition = endPosition;
         }
     }
