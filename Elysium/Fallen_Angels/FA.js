@@ -57,7 +57,7 @@ function loca_test({ texte, repondre }) {
 
     if (normalizedText.startsWith(commandPattern)) {
         const regex = /🌍position:\s*(\d+)km\s*([>]{1,2})\s*(\d+)km/i;
-        const match = normalizedText.match(regex);
+        const match = texte.match(regex);
 
         if (match) {
             const startPosition = parseInt(match[1], 10);
@@ -67,18 +67,15 @@ function loca_test({ texte, repondre }) {
             if (startPosition === endPosition) {
                 const currentLocation = map_fa.find(loc => loc.km === startPosition);
                 const lieu = currentLocation ? currentLocation.lieu : "Position inconnue";
-                repondre(`*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Position inchangée, vous êtes toujours à «${lieu}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`);
-                return;
+                return repondre(`*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Position inchangée, vous êtes toujours à «${lieu}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`);
             }
 
             const distance = Math.abs(endPosition - startPosition);
 
             if (guillemets === ">" && distance > 1) {
-                repondre("*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance à pied 🚶‍♂️! Le maximum de Km à pieds est de 1km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
-                return;
+                return repondre("*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance à pied 🚶‍♂️! Le maximum de Km à pieds est de 1km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
             } else if (guillemets === ">>" && distance > 4) {
-                repondre("*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance en voiture 🚗! Le maximum de Km en voiture est de 4km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
-                return;
+                return repondre("*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n▪️Vous ne pouvez pas parcourir autant de distance en voiture 🚗! Le maximum de Km en voiture est de 4km Max !\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔");
             }
 
             let startLocation = map_fa.find(loc => loc.km === startPosition);
@@ -87,18 +84,16 @@ function loca_test({ texte, repondre }) {
             let startName = startLocation ? startLocation.lieu : "Lieu inconnu";
             let endName = endLocation ? endLocation.lieu : "Lieu inconnu";
 
-            const message = `*`💠S Y S T È ME🌐`*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`;
+            const message = `*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»\n■■■■■▔▔▔▔▔▔▔▔▔▔▔▔`;
 
             if (endLocation && endLocation.image) {
-                repondre({
-                    text: message,
-                    image: { url: endLocation.image }
-                });
+                return repondre(
+                    { text: message },
+                    { image: { url: endLocation.image } }
+                );
             } else {
-                repondre(message);
+                return repondre(message);
             }
-
-            lastPosition = endPosition;
         }
     }
 }
