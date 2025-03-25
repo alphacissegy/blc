@@ -69,7 +69,7 @@ function loca_test({ texte, repondre, zk, dest }) {
 
     if (startPosition === endPosition) {
         const lieu = map_fa.find(loc => loc.km === startPosition)?.lieu || "Position inconnue";
-        return repondre(`*💠S Y S T È ME🌐*\n📍Position inchangée, vous êtes toujours à «${lieu}»`);
+        return repondre(`*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■📍Position inchangée, vous êtes toujours à «${lieu}»■■■■■▔▔▔▔▔▔▔▔▔▔▔`);
     }
 
     const distance = Math.abs(endPosition - startPosition);
@@ -77,7 +77,7 @@ function loca_test({ texte, repondre, zk, dest }) {
 
     if (distance > maxDistance) {
         const transport = direction === ">" ? "🚶‍♂️ à pied (1km max)" : "🚗 en voiture (4km max)";
-        return repondre(`*💠S Y S T È ME🌐*\n▪️Vous ne pouvez pas parcourir autant de distance ${transport} !`);
+        return repondre(`*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■▪️Vous ne pouvez pas parcourir autant de distance ${transport} !■■■■■▔▔▔▔▔▔▔▔▔▔▔`);
     }
 
     const startLocation = map_fa.find(loc => loc.km === startPosition);
@@ -86,7 +86,7 @@ function loca_test({ texte, repondre, zk, dest }) {
     const startName = startLocation?.lieu || "Lieu inconnu";
     const endName = endLocation?.lieu || "Lieu inconnu";
 
-    const message = `*💠S Y S T È ME🌐*\n📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»`;
+    const message = `*💠S Y S T È ME🌐*\n▔▔▔▔▔▔▔▔▔▔▔▔▔■■■■■📍Vous avez quitté «${startName}».\n📍Vous êtes désormais à «${endName}»■■■■■▔▔▔▔▔▔▔▔▔▔▔`;
 
     if (endLocation?.image) {
         return zk.sendMessage(dest, {
