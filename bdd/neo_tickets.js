@@ -1,10 +1,11 @@
 const { Pool } = require('pg');
 const s = require("../set");
+const dbUrl = s.DB;
 
 class NeoTicketsDB {
     constructor() {
         this.pool = new Pool({ 
-            connectionString: s.DB, 
+            connectionString: dbUrl, 
             ssl: { rejectUnauthorized: false } 
         });
         this.initDB();
@@ -80,11 +81,12 @@ class NeoTicketsDB {
         await this.pool.query('DELETE FROM neo_tickets');
     }
 
-    async calculateGains(mise, paris, statuts) {
+    async calculateGains(mise, paris) {
         if (!paris || paris.length === 0) return 0;
         
+        // Vérifie si tous les paris sont gagnants
         const tousGagnants = paris.every((_, index) => 
-            statuts[index] === 'victoire');
+            this.statuts[index] === 'victoire');
         
         if (!tousGagnants) return 0;
 
