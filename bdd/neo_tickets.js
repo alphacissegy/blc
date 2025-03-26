@@ -1,11 +1,10 @@
 const { Pool } = require('pg');
 const s = require("../set");
-const dbUrl = s.DB;
 
 class NeoTicketsDB {
     constructor() {
         this.pool = new Pool({ 
-            connectionString: dbUrl, 
+            connectionString: s.DB, 
             ssl: { rejectUnauthorized: false } 
         });
         this.initDB();
@@ -81,17 +80,27 @@ class NeoTicketsDB {
         await this.pool.query('DELETE FROM neo_tickets');
     }
 
-    async calculateGains(mise, paris) {
+    async getAllTickets() {
+        const res = await this.pool.query('SELECT * FROM neo_tickets ORDER BY created_at DESC');
+        return res.rows;
+    }
+
+    async searchTickets(searchTerm) {
+        const res = await this.pool.query(
+            'SELECT * FROM neo_tickets WHERE parieur ILIKE $1 ORDER BY created_at DESC',
+            [`%${searchTerm}%`]
+        );
+        return res.rows;
+    }
+
+    async calculateGains(mise, paris = [], statuts = []) {
         if (!paris || paris.length === 0) return 0;
         
-        // Vérifie si tous les paris sont gagnants
-        const tousGagnants = paris.every((_, index) => 
-            this.statuts[index] === 'victoire');
-        
+        const tousGagnants = statuts.every(s => s === 'victoire');
         if (!tousGagnants) return 0;
 
         const totalCotes = paris.reduce((acc, pari) => {
-            const cote = parseFloat(pari.cote) || 1;
+            const cote = parseFloat(pari?.cote) || 1;
             return acc * cote;
         }, 1);
         
@@ -99,16 +108,20 @@ class NeoTicketsDB {
     }
 
     async generateTicketContent(ticketData) {
-        const parisList = ticketData.paris.map((pari, index) => {
-            const statut = ticketData.statuts[index];
-            const emoji = statut === 'victoire' ? '✅' : 
-                         statut === 'echec' ? '❌' : '';
-            return `➤ ${emoji} ${pari.nom} × ${pari.cote}`;
-        }).join('\n');
+        const parisList = (ticketData.paris || [])
+            .map((pari, index) => {
+                const statut = ticketData.statuts?.[index] || '';
+                const emoji = statut === 'victoire' ? '✅' : 
+                            statut === 'echec' ? '❌' : '';
+                return `➤ ${emoji} ${pari?.nom || 'Pari ' + (index + 1)} × ${pari?.cote || '1.0'}`;
+            })
+            .join('\n');
 
-        const statutGeneral = ticketData.statuts.includes('echec') ? 'Perdu' : 
-                            (ticketData.statuts.length > 0 && ticketData.statuts.every(s => s === 'victoire')) ? 'Gagné' : 
-                            'En attente';
+        const statuts = ticketData.statuts || [];
+        const statutGeneral = 
+            statuts.includes('echec') ? 'Perdu' : 
+            (statuts.length > 0 && statuts.every(s => s === 'victoire')) ? 'Gagné' : 
+            'En attente';
 
         const gains = await this.calculateGains(ticketData.mise, ticketData.paris, ticketData.statuts);
 
@@ -126,19 +139,6 @@ ${parisList || 'Aucun pari'}
 *💰Gains Possibles*: ${gains}🧭
 ═══════════░▒▒▒▒░░▒░
                   *🔷𝗡Ξ𝗢𝗚𝗮𝗺𝗶𝗻𝗴🎮*`;
-    }
-
-    async getAllTickets() {
-        const res = await this.pool.query('SELECT parieur, mise, statuts FROM neo_tickets ORDER BY created_at DESC');
-        return res.rows;
-    }
-
-    async searchTickets(searchTerm) {
-        const res = await this.pool.query(
-            'SELECT parieur, mise, statuts FROM neo_tickets WHERE parieur ILIKE $1 ORDER BY created_at DESC',
-            [`%${searchTerm}%`]
-        );
-        return res.rows;
     }
 }
 
