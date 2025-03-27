@@ -20,8 +20,18 @@ class NeoTicketsDB {
                     parieur TEXT NOT NULL UNIQUE,
                     modo TEXT DEFAULT '',
                     mise NUMERIC DEFAULT 0,
-                    paris JSONB DEFAULT '[]',
-                    statuts JSONB DEFAULT '[]',
+                    pari1 TEXT DEFAULT '',
+                    cote1 NUMERIC DEFAULT 1,
+                    statut1 TEXT DEFAULT '',
+                    pari2 TEXT DEFAULT '',
+                    cote2 NUMERIC DEFAULT 1,
+                    statut2 TEXT DEFAULT '',
+                    pari3 TEXT DEFAULT '',
+                    cote3 NUMERIC DEFAULT 1,
+                    statut3 TEXT DEFAULT '',
+                    pari4 TEXT DEFAULT '',
+                    cote4 NUMERIC DEFAULT 1,
+                    statut4 TEXT DEFAULT '',
                     created_at TIMESTAMP DEFAULT NOW(),
                     updated_at TIMESTAMP DEFAULT NOW()
                 )
@@ -81,26 +91,33 @@ class NeoTicketsDB {
         await this.pool.query('DELETE FROM neo_tickets');
     }
 
-    async calculateGains(mise, paris) {
-        if (!paris || paris.length === 0) return 0;
-        const totalCotes = paris.reduce((acc, pari) => {
-            const cote = parseFloat(pari.cote) || 1;
-            return acc * cote;
-        }, 1);
+    async calculateGains(mise, ticketData) {
+        let totalCotes = 1;
+        for (let i = 1; i <= 4; i++) {
+            if (ticketData[`pari${i}`] && ticketData[`statut${i}`] === 'victoire') {
+                totalCotes *= ticketData[`cote${i}`] || 1;
+            }
+        }
         return mise * totalCotes;
     }
 
     async generateTicketContent(ticketData) {
-        const parisList = ticketData.paris.map((pari, index) => {
-            const statut = ticketData.statuts[index];
-            const emoji = statut === 'victoire' ? '✅' : statut === 'echec' ? '❌' : '';
-            return `➤ ${emoji} ${pari.nom} × ${pari.cote}`;
-        }).join('\n');
+        let parisList = '';
+        for (let i = 1; i <= 4; i++) {
+            if (ticketData[`pari${i}`]) {
+                const emoji = ticketData[`statut${i}`] === 'victoire' ? '✅' : 
+                             ticketData[`statut${i}`] === 'echec' ? '❌' : '';
+                parisList += `➤ ${emoji} ${ticketData[`pari${i}`]} × ${ticketData[`cote${i}`]}\n`;
+            }
+        }
 
-        const statutGeneral = ticketData.statuts.includes('echec') ? 'Perdu' : 
-                            (ticketData.statuts.length > 0 && !ticketData.statuts.includes('echec')) ? 'Gagné' : 'En attente';
+        const statutGeneral = Object.keys(ticketData).some(key => key.startsWith('statut') && ticketData[key] === 'echec') 
+                           ? 'Perdu' 
+                           : Object.keys(ticketData).some(key => key.startsWith('statut') && ticketData[key] === 'victoire')
+                             ? 'Gagné' 
+                             : 'En attente';
 
-        const gains = await this.calculateGains(ticketData.mise, ticketData.paris);
+        const gains = await this.calculateGains(ticketData.mise, ticketData);
 
         return `.            *⌬𝗡Ξ𝗢𝘃𝗲𝗿𝘀𝗲 𝗕𝗘𝗧🎰*
 ▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░
@@ -111,7 +128,7 @@ class NeoTicketsDB {
 *📜Statut du ticket*: ${statutGeneral}
 
 *📜Liste des paris placés*:
-${parisList}
+${parisList || '[Aucun pari]'}
 
 *💰Gains Possibles*: ${gains}🧭
 ═══════════░▒▒▒▒░░▒░
@@ -119,13 +136,13 @@ ${parisList}
     }
 
     async getAllTickets() {
-        const res = await this.pool.query('SELECT parieur, mise, statuts FROM neo_tickets ORDER BY created_at DESC');
+        const res = await this.pool.query('SELECT parieur, mise FROM neo_tickets ORDER BY created_at DESC');
         return res.rows;
     }
 
     async searchTickets(searchTerm) {
         const res = await this.pool.query(
-            'SELECT parieur, mise, statuts FROM neo_tickets WHERE parieur ILIKE $1 ORDER BY created_at DESC',
+            'SELECT parieur, mise FROM neo_tickets WHERE parieur ILIKE $1 ORDER BY created_at DESC',
             [`%${searchTerm}%`]
         );
         return res.rows;
