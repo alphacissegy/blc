@@ -34,9 +34,7 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
             if (tickets.length === 0) return repondre('Aucun ticket trouvé');
             let message = `📋 *Liste des Tickets* (${tickets.length})\n▔▔▔▔▔▔▔▔▔▔▔▔\n`;
             tickets.forEach(ticket => {
-                const status = ticket.statuts.includes('echec') ? '❌ Perdu' : 
-                             ticket.statuts.includes('victoire') ? '✅ Gagné' : '⌛ En cours';
-                message += `• *${ticket.parieur}* - Mise: ${ticket.mise} - ${status}\n`;
+                message += `• *${ticket.parieur}* - Mise: ${ticket.mise}\n`;
             });
             return repondre(message);
         }
@@ -69,49 +67,30 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
         }
 
         if (arg[1].startsWith('pari') && arg[2] === '=') {
-            const pariIndex = parseInt(arg[1].replace('pari', '')) - 1;
+            const pariNum = arg[1].replace('pari', '');
+            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de pari invalide (1-4)');
             const pariNom = arg.slice(3).join(' ');
-            const paris = Array.isArray(ticketData.paris) ? [...ticketData.paris] : [];
-            const statuts = Array.isArray(ticketData.statuts) ? [...ticketData.statuts] : [];
-            
-            if (!paris[pariIndex]) {
-                paris[pariIndex] = { nom: pariNom, cote: 1.0 };
-            } else {
-                paris[pariIndex].nom = pariNom;
-            }
-            
-            if (!statuts[pariIndex]) statuts[pariIndex] = '';
-            
-            await neoDB.updateTicket(parieur, { paris, statuts });
-            return repondre(`Pari ${pariIndex + 1} mis à jour: ${pariNom}`);
+            await neoDB.updateTicket(parieur, { [`pari${pariNum}`]: pariNom });
+            return repondre(`Pari ${pariNum} mis à jour: ${pariNom}`);
         }
 
         if (arg[1].startsWith('cote') && arg[2] === '=') {
-            const pariIndex = parseInt(arg[1].replace('cote', '')) - 1;
-            const pariCote = parseFloat(arg[3]);
-            
-            if (isNaN(pariCote)) return repondre('La cote doit être un nombre');
-            
-            const paris = Array.isArray(ticketData.paris) ? [...ticketData.paris] : [];
-            
-            if (!paris[pariIndex]) {
-                paris[pariIndex] = { nom: 'Pari à définir', cote: pariCote };
-            } else {
-                paris[pariIndex].cote = pariCote;
-            }
-            
-            await neoDB.updateTicket(parieur, { paris });
-            return repondre(`Cote ${pariIndex + 1} mise à jour: ${pariCote}`);
+            const pariNum = arg[1].replace('cote', '');
+            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de cote invalide (1-4)');
+            const cote = parseFloat(arg[3]);
+            if (isNaN(cote)) return repondre('La cote doit être un nombre');
+            await neoDB.updateTicket(parieur, { [`cote${pariNum}`]: cote });
+            return repondre(`Cote ${pariNum} mise à jour: ${cote}`);
         }
 
         if (arg[1].startsWith('pari') && arg[2] === 'statut') {
-            const pariIndex = parseInt(arg[1].replace('pari', '')) - 1;
+            const pariNum = arg[1].replace('pari', '');
+            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de pari invalide (1-4)');
             const statut = arg[3];
-            const statuts = [...ticketData.statuts];
-            statuts[pariIndex] = statut;
-            await neoDB.updateTicket(parieur, { statuts });
+            if (!['victoire','echec',''].includes(statut)) return repondre('Statut invalide (victoire/echec)');
+            await neoDB.updateTicket(parieur, { [`statut${pariNum}`]: statut });
             const emoji = statut === 'victoire' ? '✅' : '❌';
-            return repondre(`Statut du pari ${pariIndex + 1} mis à jour: ${emoji}`);
+            return repondre(`Statut du pari ${pariNum} mis à jour: ${emoji}`);
         }
 
         if (arg.length === 1) {
@@ -132,8 +111,8 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
 
         repondre("Commande non reconnue. Syntaxe:\n" +
                  "- ticketbet (affiche ticket vierge)\n" +
-                 "- ticketbet [parieur] pari[1-9] = [nom du pari]\n" +
-                 "- ticketbet [parieur] cote[1-9] = [cote]");
+                 "- ticketbet [parieur] pari[1-4] = [nom du pari]\n" +
+                 "- ticketbet [parieur] cote[1-4] = [cote]");
 
     } catch (error) {
         console.error("Erreur:", error);
