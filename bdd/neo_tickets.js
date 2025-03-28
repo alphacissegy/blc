@@ -51,7 +51,7 @@ class NeoTicketsDB {
 
     async getTicket(parieur) {
         const res = await this.pool.query(
-            'SELECT * FROM neo_tickets WHERE parieur = $1',
+            'SELECT * FROM neo_tickets WHERE LOWER(parieur) = LOWER($1)',
             [parieur]
         );
         return res.rows[0];
@@ -72,7 +72,7 @@ class NeoTicketsDB {
         const query = `
             UPDATE neo_tickets 
             SET ${fields.join(', ')}, updated_at = NOW() 
-            WHERE parieur = $${paramIndex} 
+            WHERE LOWER(parieur) = LOWER($${paramIndex}) 
             RETURNING *
         `;
 
@@ -82,7 +82,7 @@ class NeoTicketsDB {
 
     async deleteTicket(parieur) {
         await this.pool.query(
-            'DELETE FROM neo_tickets WHERE parieur = $1',
+            'DELETE FROM neo_tickets WHERE LOWER(parieur) = LOWER($1)',
             [parieur]
         );
     }
@@ -119,7 +119,7 @@ class NeoTicketsDB {
 
         const gains = await this.calculateGains(ticketData.mise, ticketData);
 
-        return `.            *⌬𝗡Ξ𝗢𝘃𝗲𝗿𝘀𝗲 𝗕𝗘𝗧🎰*
+        return `.            *⌬NΞOverse BET🎰*
 ▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░
 
 *👥Parieur*: ${ticketData.parieur}
@@ -132,7 +132,7 @@ ${parisList || '[Aucun pari]'}
 
 *💰Gains Possibles*: ${gains}🧭
 ═══════════░▒▒▒▒░░▒░
-                  *🔷𝗡Ξ𝗢𝗚𝗮𝗺𝗶𝗻𝗴🎮*`;
+                  *🔷NΞOGaming🎮*`;
     }
 
     async getAllTickets() {
