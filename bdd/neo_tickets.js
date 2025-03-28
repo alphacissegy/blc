@@ -49,7 +49,7 @@ async function initDB() {
   const client = await pool.connect();
   try {
     await client.query(`
-      CREATE TABLE IF NOT EXISTS neotickets (
+      CREATE TABLE IF NOT EXISTS neo_tickets (
         id SERIAL PRIMARY KEY,
         bettor TEXT UNIQUE,
         moderator TEXT,
@@ -72,7 +72,7 @@ async function initDB() {
 async function getTicket(bettor) {
   const client = await pool.connect();
   try {
-    const res = await client.query('SELECT * FROM neotickets WHERE bettor = $1', [bettor]);
+    const res = await client.query('SELECT * FROM neo_tickets WHERE bettor = $1', [bettor]);
     if (res.rows.length === 0) return null;
 
     const data = res.rows[0];
@@ -94,7 +94,7 @@ async function saveTicket(ticket) {
   const client = await pool.connect();
   try {
     await client.query(`
-      INSERT INTO neotickets (bettor, moderator, stake, bets, odds, statuses, final_status)
+      INSERT INTO neo_tickets (bettor, moderator, stake, bets, odds, statuses, final_status)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT (bettor) DO UPDATE SET
         moderator = EXCLUDED.moderator,
@@ -120,7 +120,7 @@ async function saveTicket(ticket) {
 async function deleteTicket(bettor) {
   const client = await pool.connect();
   try {
-    await client.query('DELETE FROM neotickets WHERE bettor = $1', [bettor]);
+    await client.query('DELETE FROM neo_tickets WHERE bettor = $1', [bettor]);
   } finally {
     client.release();
   }
@@ -129,7 +129,7 @@ async function deleteTicket(bettor) {
 async function deleteAllTickets() {
   const client = await pool.connect();
   try {
-    await client.query('DELETE FROM neotickets');
+    await client.query('DELETE FROM neo_tickets');
   } finally {
     client.release();
   }
@@ -138,7 +138,7 @@ async function deleteAllTickets() {
 async function listTickets() {
   const client = await pool.connect();
   try {
-    const res = await client.query('SELECT * FROM neotickets');
+    const res = await client.query('SELECT * FROM neo_tickets');
     return res.rows;
   } finally {
     client.release();
