@@ -4,7 +4,7 @@ const neoDB = require('../bdd/neo_tickets');
 zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, async (dest, zk, { repondre, arg, ms, superUser }) => {
     try {
         if (!arg || arg.length === 0) {
-            const ticketVierge = `.            *⌬𝗡Ξ𝗢𝘃𝗲𝗿𝘀𝗲 𝗕𝗘𝗧🎰*
+            const ticketVierge = `.            *⌬NΞOverse BET🎰*
 ▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░
 
 *👥Parieur*: [Nom du parieur]
@@ -16,10 +16,9 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
 ➤ [Valeur du pari 2] × [Cote du pari 2]
 ➤ [Valeur du pari 3] × [Cote du pari 3]
 
-
 *💰Gains Possibles*: [Montant des gains possibles]🧭
 ═══════════░▒▒▒▒░░▒░
-                  *🔷𝗡Ξ𝗢𝗚𝗮𝗺𝗶𝗻𝗴🎮*`;
+                  *🔷NΞOGaming🎮*`;
             return repondre(ticketVierge);
         }
 
@@ -39,68 +38,9 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
             return repondre(message);
         }
 
-        if (action === 'parieur' && arg[1] === '=') {
-            const parieur = arg.slice(2).join(' ');
-            await neoDB.createTicket(parieur);
-            return repondre(`Ticket créé pour ${parieur}`);
-        }
-
-        const parieur = arg[0];
-        const ticketData = await neoDB.getTicket(parieur);
-        
-        if (!ticketData && action !== 'clear') {
-            return repondre(`Aucun ticket trouvé pour ${parieur}`);
-        }
-
-        if (arg[1] === 'modo' && arg[2] === '=') {
-            const modo = arg.slice(3).join(' ');
-            await neoDB.updateTicket(parieur, { modo });
-            return repondre(`Modérateur mis à jour: ${modo}`);
-        }
-
-        if (arg[1] === 'mise' && ['+', '-'].includes(arg[2])) {
-            const operation = arg[2];
-            const montant = parseFloat(arg[3]);
-            const newMise = operation === '+' ? ticketData.mise + montant : ticketData.mise - montant;
-            await neoDB.updateTicket(parieur, { mise: newMise });
-            return repondre(`Mise mise à jour: ${newMise}`);
-        }
-
-        if (arg[1].startsWith('pari') && arg[2] === '=') {
-            const pariNum = arg[1].replace('pari', '');
-            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de pari invalide (1-4)');
-            const pariNom = arg.slice(3).join(' ');
-            await neoDB.updateTicket(parieur, { [`pari${pariNum}`]: pariNom });
-            return repondre(`Pari ${pariNum} mis à jour: ${pariNom}`);
-        }
-
-        if (arg[1].startsWith('cote') && arg[2] === '=') {
-            const pariNum = arg[1].replace('cote', '');
-            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de cote invalide (1-4)');
-            const cote = parseFloat(arg[3]);
-            if (isNaN(cote)) return repondre('La cote doit être un nombre');
-            await neoDB.updateTicket(parieur, { [`cote${pariNum}`]: cote });
-            return repondre(`Cote ${pariNum} mise à jour: ${cote}`);
-        }
-
-        if (arg[1].startsWith('pari') && arg[2] === 'statut') {
-            const pariNum = arg[1].replace('pari', '');
-            if (!['1','2','3','4'].includes(pariNum)) return repondre('Numéro de pari invalide (1-4)');
-            const statut = arg[3];
-            if (!['victoire','echec',''].includes(statut)) return repondre('Statut invalide (victoire/echec)');
-            await neoDB.updateTicket(parieur, { [`statut${pariNum}`]: statut });
-            const emoji = statut === 'victoire' ? '✅' : '❌';
-            return repondre(`Statut du pari ${pariNum} mis à jour: ${emoji}`);
-        }
-
-        if (arg.length === 1) {
-            const ticketContent = await neoDB.generateTicketContent(ticketData);
-            return repondre(ticketContent);
-        }
-
         if (action === 'clear') {
             if (!superUser) return repondre('Action réservée aux administrateurs');
-            if (arg[1].toLowerCase() === 'all') {
+            if (arg[1]?.toLowerCase() === 'all') {
                 await neoDB.deleteAllTickets();
                 return repondre('Tous les tickets ont été supprimés');
             } else {
@@ -109,10 +49,58 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
             }
         }
 
-        repondre("Commande non reconnue. Syntaxe:\n" +
-                 "- ticketbet (affiche ticket vierge)\n" +
-                 "- ticketbet [parieur] pari[1-4] = [nom du pari]\n" +
-                 "- ticketbet [parieur] cote[1-4] = [cote]");
+        const parieur = arg[0];
+        let ticketData = await neoDB.getTicket(parieur);
+
+        if (arg[1]?.toLowerCase() === 'parieur' && arg[2] === '=') {
+            const newParieur = arg.slice(3).join(' ');
+            if (ticketData) return repondre(`Le parieur ${parieur} existe déjà`);
+            ticketData = await neoDB.createTicket(newParieur);
+            return repondre(`Ticket créé pour ${newParieur}`);
+        }
+
+        if (!ticketData) {
+            if (arg[1] === '=') {
+                ticketData = await neoDB.createTicket(parieur);
+                return repondre(`Ticket créé pour ${parieur}`);
+            }
+            return repondre(`Aucun ticket trouvé pour ${parieur}. Créez-le d'abord avec "ticketbet ${parieur} ="`);
+        }
+
+        if (!arg[1]) {
+            const ticketContent = await neoDB.generateTicketContent(ticketData);
+            return repondre(ticketContent);
+        }
+
+        const field = arg[1].toLowerCase();
+        const operator = arg[2];
+
+        if (operator !== '=') {
+            return repondre("Syntaxe incorrecte. Utilisez: ticketbet [parieur] [champ] = [valeur]");
+        }
+
+        const value = arg.slice(3).join(' ');
+        const updates = {};
+
+        if (field === 'modo') {
+            updates.modo = value;
+        } else if (field === 'mise') {
+            updates.mise = parseFloat(value) || 0;
+        } else if (field.startsWith('pari') && ['1','2','3','4'].includes(field[4])) {
+            updates[field] = value;
+        } else if (field.startsWith('cote') && ['1','2','3','4'].includes(field[4])) {
+            updates[field] = parseFloat(value) || 1;
+        } else if (field.startsWith('statut') && ['1','2','3','4'].includes(field[6])) {
+            if (!['victoire','echec',''].includes(value.toLowerCase())) {
+                return repondre('Statut invalide (victoire/echec)');
+            }
+            updates[`statut${field[6]}`] = value.toLowerCase();
+        } else {
+            return repondre("Champ invalide. Champs valides: modo, mise, pari1-4, cote1-4, statut1-4");
+        }
+
+        await neoDB.updateTicket(parieur, updates);
+        return repondre(`${field} mis à jour pour ${parieur}`);
 
     } catch (error) {
         console.error("Erreur:", error);
