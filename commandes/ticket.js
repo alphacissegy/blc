@@ -1,10 +1,21 @@
 const { zokou } = require('../framework/zokou');
-const neoDB = require('../bdd/neo_tickets');
+const { 
+  Ticket,
+  getTicket,
+  saveTicket,
+  deleteTicket,
+  deleteAllTickets,
+  listTickets
+} = require('./neo_tickets');
 
-zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, async (dest, zk, { repondre, arg, ms, superUser }) => {
-    try {
-        if (!arg || arg.length === 0) {
-            const ticketVierge = `.            *⌬NΞOverse BET🎰*
+zokou({ 
+  nomCom: 'ticketbet', 
+  reaction: '🎫', 
+  categorie: 'NEO_GAMES🎰' 
+}, async (dest, zk, { repondre, arg, ms }) => {
+  // Template par défaut
+  if (!arg || arg.length === 0) {
+    const template = `.            *⌬𝗡Ξ𝗢𝘃𝗲𝗿𝘀𝗲 𝗕𝗘𝗧🎰*
 ▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░
 
 *👥Parieur*: [Nom du parieur]
@@ -18,92 +29,150 @@ zokou({ nomCom: 'ticketbet', reaction: '🎫', categorie: 'NEO_GAMES🎰' }, asy
 
 *💰Gains Possibles*: [Montant des gains possibles]🧭
 ═══════════░▒▒▒▒░░▒░
-                  *🔷NΞOGaming🎮*`;
-            return repondre(ticketVierge);
-        }
+                  *🔷𝗡Ξ𝗢𝗚𝗮𝗺𝗶𝗻𝗴🎮*`;
+    return repondre(template);
+  }
 
-        const action = arg[0].toLowerCase();
+  const args = arg.join(' ').split(' ');
+  const command = args[0].toLowerCase();
 
-        if (action === 'list') {
-            if (!superUser) return repondre('🔒 Réservé aux admins');
-            const searchTerm = arg[1];
-            const tickets = searchTerm 
-                ? await neoDB.searchTickets(searchTerm)
-                : await neoDB.getAllTickets();
-            if (tickets.length === 0) return repondre('Aucun ticket trouvé');
-            let message = `📋 *Liste des Tickets* (${tickets.length})\n▔▔▔▔▔▔▔▔▔▔▔▔\n`;
-            tickets.forEach(ticket => {
-                message += `• *${ticket.parieur}* - Mise: ${ticket.mise}\n`;
-            });
-            return repondre(message);
-        }
+  // Création de ticket
+  if (command === 'parieur' && args[1] === '=' && args[2]) {
+    const bettor = args.slice(2).join(' ');
+    const ticket = new Ticket(bettor);
+    await saveTicket(ticket);
+    return repondre(`✅ Ticket créé pour ${bettor}`);
+  }
 
-        if (action === 'clear') {
-            if (!superUser) return repondre('Action réservée aux administrateurs');
-            if (arg[1]?.toLowerCase() === 'all') {
-                await neoDB.deleteAllTickets();
-                return repondre('Tous les tickets ont été supprimés');
-            } else {
-                await neoDB.deleteTicket(arg[1]);
-                return repondre(`Ticket de ${arg[1]} supprimé`);
-            }
-        }
+  // Liste des tickets
+  if (command === 'list') {
+    const tickets = await listTickets();
+    let message = `.            *⌬NΞOverse BET🎰*\n▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░\n\n*📋Liste des tickets* (${tickets.length})\n▔▔▔▔▔▔▔▔▔▔▔▔\n`;
+    
+    tickets.forEach(t => {
+      message += `* ${t.bettor} - Mise: ${t.stake} - ${t.final_status}\n`;
+    });
 
-        const parieur = arg[0];
-        let ticketData = await neoDB.getTicket(parieur);
+    message += `\n═══════════░▒▒▒▒░░▒░\n                  *🔷NΞOGaming🎮*`;
+    return repondre(message);
+  }
 
-        if (arg[1]?.toLowerCase() === 'parieur' && arg[2] === '=') {
-            const newParieur = arg.slice(3).join(' ');
-            if (ticketData) return repondre(`Le parieur ${parieur} existe déjà`);
-            ticketData = await neoDB.createTicket(newParieur);
-            return repondre(`Ticket créé pour ${newParieur}`);
-        }
-
-        if (!ticketData) {
-            if (arg[1] === '=') {
-                ticketData = await neoDB.createTicket(parieur);
-                return repondre(`Ticket créé pour ${parieur}`);
-            }
-            return repondre(`Aucun ticket trouvé pour ${parieur}. Créez-le d'abord avec "ticketbet ${parieur} ="`);
-        }
-
-        if (!arg[1]) {
-            const ticketContent = await neoDB.generateTicketContent(ticketData);
-            return repondre(ticketContent);
-        }
-
-        const field = arg[1].toLowerCase();
-        const operator = arg[2];
-
-        if (operator !== '=') {
-            return repondre("Syntaxe incorrecte. Utilisez: ticketbet [parieur] [champ] = [valeur]");
-        }
-
-        const value = arg.slice(3).join(' ');
-        const updates = {};
-
-        if (field === 'modo') {
-            updates.modo = value;
-        } else if (field === 'mise') {
-            updates.mise = parseFloat(value) || 0;
-        } else if (field.startsWith('pari') && ['1','2','3','4'].includes(field[4])) {
-            updates[field] = value;
-        } else if (field.startsWith('cote') && ['1','2','3','4'].includes(field[4])) {
-            updates[field] = parseFloat(value) || 1;
-        } else if (field.startsWith('statut') && ['1','2','3','4'].includes(field[6])) {
-            if (!['victoire','echec',''].includes(value.toLowerCase())) {
-                return repondre('Statut invalide (victoire/echec)');
-            }
-            updates[`statut${field[6]}`] = value.toLowerCase();
-        } else {
-            return repondre("Champ invalide. Champs valides: modo, mise, pari1-4, cote1-4, statut1-4");
-        }
-
-        await neoDB.updateTicket(parieur, updates);
-        return repondre(`${field} mis à jour pour ${parieur}`);
-
-    } catch (error) {
-        console.error("Erreur:", error);
-        repondre("Une erreur est survenue: " + error.message);
+  // Suppression
+  if (command === 'clear') {
+    const target = args[1];
+    if (target === 'all') {
+      await deleteAllTickets();
+      return repondre('🗑️ Tous les tickets supprimés');
+    } else {
+      await deleteTicket(target);
+      return repondre(`🗑️ Ticket de ${target} supprimé`);
     }
+  }
+
+  // Gestion des tickets existants
+  const ticket = await getTicket(command);
+  if (!ticket) return repondre(`❌ Aucun ticket trouvé pour ${command}`);
+
+  // Modification du modérateur
+  if (args[1] === 'modo' && args[2] === '=' && args[3]) {
+    ticket.moderator = args.slice(3).join(' ');
+    await saveTicket(ticket);
+    return repondre(`🛡️ Modérateur mis à jour`);
+  }
+
+  // Gestion de la mise
+  if (args[1] === 'mise' && args[2] && args[3]) {
+    const operator = args[2];
+    const amount = parseInt(args[3]);
+
+    if (isNaN(amount)) return repondre('❌ Montant invalide');
+
+    switch (operator) {
+      case '=': ticket.stake = amount; break;
+      case '+': ticket.stake += amount; break;
+      case '-': ticket.stake -= amount; break;
+      default: return repondre('❌ Opérateur invalide (=/+/-)');
+    }
+
+    await saveTicket(ticket);
+    return repondre(`💰 Mise mise à jour: ${ticket.stake}🧭`);
+  }
+
+  // Gestion des paris
+  if (args[1].startsWith('pari') && !args[1].includes('statut')) {
+    if (args[2] !== '=' || !args[3]) return repondre('❌ Syntaxe: ticketbet [parieur] pari[N] = [valeur]');
+
+    const betIndex = parseInt(args[1].replace('pari', '')) - 1;
+    const betValue = args.slice(3).join(' ');
+
+    // Initialisation dynamique
+    while (ticket.bets.length <= betIndex) {
+      ticket.bets.push("");
+      ticket.odds.push("1.00");
+      ticket.statuses.push("⏳");
+    }
+
+    ticket.bets[betIndex] = betValue;
+    await saveTicket(ticket);
+    return repondre(`📜 Pari ${betIndex + 1} mis à jour`);
+  }
+
+  // Gestion des cotes
+  if (args[1].startsWith('cote')) {
+    if (args[2] !== '=' || !args[3]) return repondre('❌ Syntaxe: ticketbet [parieur] cote[N] = [valeur]');
+
+    const oddIndex = parseInt(args[1].replace('cote', '')) - 1;
+    const oddValue = args[3];
+
+    if (isNaN(parseFloat(oddValue))) return repondre('❌ Cote invalide');
+
+    while (ticket.odds.length <= oddIndex) {
+      ticket.bets.push("");
+      ticket.odds.push("1.00");
+      ticket.statuses.push("⏳");
+    }
+
+    ticket.odds[oddIndex] = oddValue;
+    await saveTicket(ticket);
+    return repondre(`📊 Cote ${oddIndex + 1} mise à jour`);
+  }
+
+  // Gestion des statuts
+  if (args[1].includes('statut')) {
+    const betIndex = parseInt(args[1].replace('pari', '').replace('statut', '')) - 1;
+    const status = args[2]?.toLowerCase();
+
+    if (betIndex >= ticket.bets.length) return repondre('❌ Pari inexistant');
+    if (!['victoire', 'echec'].includes(status)) return repondre('❌ Statut invalide (victoire/echec)');
+
+    ticket.statuses[betIndex] = status === 'victoire' ? "✅" : "❌";
+    ticket.updateFinalStatus();
+    await saveTicket(ticket);
+    return repondre(`🔄 Statut du pari ${betIndex + 1} mis à jour`);
+  }
+
+  // Affichage du ticket
+  let message = `.            *⌬𝗡Ξ𝗢𝘃𝗲𝗿𝘀𝗲 𝗕𝗘𝗧🎰*\n▔▔▔▔▔▔▔▔▔▔▔▔░▒▒▒▒░░▒░\n\n`;
+  message += `*👥Parieur*: ${ticket.bettor}\n`;
+  message += `*🛡️Modérateur*: ${ticket.moderator || "Non défini"}\n`;
+  message += `*💰Somme misée*: ${ticket.stake}🧭\n`;
+  
+  if (ticket.statuses.length > 0) {
+    message += `*📜Statut du ticket*: ${ticket.finalStatus}\n`;
+  }
+
+  message += `\n*📜Liste des paris placés*:\n`;
+  
+  if (ticket.bets.length === 0) {
+    message += `➤ [Aucun pari enregistré]\n`;
+  } else {
+    ticket.bets.forEach((bet, i) => {
+      message += `➤ ${bet} × ${ticket.odds[i]} ${ticket.statuses[i] || "⏳"}\n`;
+    });
+  }
+
+  message += `\n*💰Gains Possibles*: ${ticket.calculatePotentialGains()}🧭\n`;
+  message += `═══════════░▒▒▒▒░░▒░\n                  *🔷𝗡Ξ𝗢𝗚𝗮𝗺𝗶𝗻𝗴🎮*`;
+
+  repondre(message);
 });
