@@ -1,8 +1,8 @@
 FROM node:lts-buster
 
-RUN git clone https://github.com/Nignanfatao/Neoverse_md_wa-bot /root/Neoverse_md_wa-bot
+RUN git clone https://github.com/Ainz-fo/Neoverse-Md /root/Neoverse-md
 
-WORKDIR /root/Neoverse_md_wa-bot
+WORKDIR /root/Neoverse-md
 
 COPY package.json .
 run npm install -g npm@10.2.4
