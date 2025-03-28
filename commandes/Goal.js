@@ -98,61 +98,61 @@ async function goal(zk, dest, repondre, texte) {
     }
 
     if (resultat === "but") {
-        let messageBut = "🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱\n";
+        let messageBut = "*🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱\n*";
         
         const commentaires = {
             droite: {
                 lucarne: [
-                    "UNE ŒUVRE D'ART ! La lucarne droite est pulvérisée par cette frappe venue d'ailleurs !",
-                    "COMME UN MISSILE GUIDÉ ! Le ballon se niche dans la lucarne droite à vitesse incroyable - le gardien est sonné !",
-                    "TOUT CE QU'IL Y A DE PLUS BEAU ! Ce ballon dans la lucarne droite mériterait d'être encadré !",
-                    "LA PERFECTION ABSOLUE ! Frappe à ras du poteau droit, impossible à arrêter !",
-                    "UN CHEF-D'ŒUVRE ! La lucarne droite vient de vivre un moment historique avec ce bijou !"
+                    "*🎙️: UNE ŒUVRE D'ART ! La lucarne droite est pulvérisée par cette frappe venue d'ailleurs !",
+                    "*🎙️: COMME UN MISSILE GUIDÉ ! Le ballon se niche dans la lucarne droite à vitesse incroyable - le gardien est sonné !*",
+                    "*🎙️: TOUT CE QU'IL Y A DE PLUS BEAU ! Ce ballon dans la lucarne droite mériterait d'être encadré !*",
+                    "*🎙️: LA PERFECTION ABSOLUE ! Frappe à ras du poteau droit, impossible à arrêter !*",
+                    "*🎙️: UN CHEF-D'ŒUVRE ! La lucarne droite vient de vivre un moment historique avec ce bijou !*"
                 ],
                 coin: [
-                    "PRÉCISION CHIRURGICALE ! Le petit filet droit est trouvé comme par magie !",
-                    "LE GARDIEN HUMAINÉ ! Une frappe enroulée qui se love dans le petit coin droit !",
-                    "COMME UN GANT ! Le ballon épouse parfaitement les filets du petit côté droit !",
-                    "UNE FINESSE RARE ! Le tireur a déposé le ballon délicatement dans le petit filet droit !",
-                    "TOUT EN DÉLICATESSE ! Un placement millimétré dans le coin droit - magnifique !"
+                    "*🎙️: PRÉCISION CHIRURGICALE ! Le petit filet droit est trouvé comme par magie !*",
+                    "*🎙️: LE GARDIEN HUMAINÉ ! Une frappe enroulée qui se love dans le petit coin droit !*",
+                    "*🎙️: COMME UN GANT ! Le ballon épouse parfaitement les filets du petit côté droit !*",
+                    "*🎙️: UNE FINESSE RARE ! Le tireur a déposé le ballon délicatement dans le petit filet droit !*",
+                    "*🎙️: TOUT EN DÉLICATESSE ! Un placement millimétré dans le coin droit - magnifique !*"
                 ],
                 miHauteur: [
-                    "UNE FLÈCHE ! Frappe croisée à ras de terre qui file au fond des filets droits !",
-                    "DÉPART INCENDIE ! Le ballon traverse la surface à toute vitesse côté droit !",
-                    "COMME UN COUP DE CISEAUX ! Une frappe sèche qui tranche la défense droite !",
-                    "UNE BOMBE ! Le gardien a plongé mais ne pouvait rien contre cette puissance !",
-                    "EFFET MAÎTRISÉ ! Le ballon trompe le gardien avec un rebond imprévisible à droite !"
+                    "*🎙️: UNE FLÈCHE ! Frappe croisée à ras de terre qui file au fond des filets droits !*",
+                    "*🎙️: DÉPART INCENDIE ! Le ballon traverse la surface à toute vitesse côté droit !*",
+                    "*🎙️: COMME UN COUP DE CISEAUX ! Une frappe sèche qui tranche la défense droite !*",
+                    "*🎙️: UNE BOMBE ! Le gardien a plongé mais ne pouvait rien contre cette puissance !*",
+                    "*🎙️: EFFET MAÎTRISÉ ! Le ballon trompe le gardien avec un rebond imprévisible à droite !*"
                 ]
             },
             gauche: {
                 lucarne: [
-                    "QUEL BEAUTÉ ! La lucarne gauche vient d'être frappée par la foudre !",
-                    "DINGUE ! Ce ballon dans la lucarne gauche à fait trembler les filets !",
-                    "À LA MARGE DE L'IMPOSSIBLE ! Un angle fermé en lucarne gauche - sublime !",
-                    "UNE FRAPPE POUR LES ÉTOILES ! La lucarne gauche n'a jamais vu ça !",
-                    "LE GARDIEN PEUT RENTRER ! Ce bijou dans la lucarne gauche est déjà au musée !"
+                    "*🎙️: QUEL BEAUTÉ ! La lucarne gauche vient d'être frappée par la foudre !*",
+                    "*🎙️: DINGUE ! Ce ballon dans la lucarne gauche à fait trembler les filets !*",
+                    "*🎙️: À LA MARGE DE L'IMPOSSIBLE ! Un angle fermé en lucarne gauche - sublime !*",
+                    "*🎙️: UNE FRAPPE POUR LES ÉTOILES ! La lucarne gauche n'a jamais vu ça !*",
+                    "*🎙️: LE GARDIEN PEUT RENTRER ! Ce bijou dans la lucarne gauche est déjà au musée !*"
                 ],
                 coin: [
-                    "UN VÉRITABLE BIJOU ! Le petit filet gauche vient d'être sublimé !",
-                    "FINITION D'EXCEPTION ! Le ballon se love dans le petit coin gauche !",
-                    "DU GRAND ART ! Un placement divin dans les filets gauches !",
-                    "COMME UNE CARESSE ! Le ballon effleure le filet gauche avec délicatesse !",
-                    "PRÉCISION D'HORLOGER ! Le petit coin gauche est trouvé avec maestria !"
+                    "*🎙️: UN VÉRITABLE BIJOU ! Le petit filet gauche vient d'être sublimé !*",
+                    "*🎙️: FINITION D'EXCEPTION ! Le ballon se love dans le petit coin gauche !*",
+                    "*🎙️: DU GRAND ART ! Un placement divin dans les filets gauches !*",
+                    "*🎙️: COMME UNE CARESSE ! Le ballon effleure le filet gauche avec délicatesse !*",
+                    "*🎙️: PRÉCISION D'HORLOGER ! Le petit coin gauche est trouvé avec maestria !*"
                 ],
                 miHauteur: [
-                    "UNE FRAPPE ASSASSINE ! Le ballon transperce la défense côté gauche !",
-                    "FROID COMME UN GLACON ! Le tireur a placé sa frappe à gauche sans pitié !",
-                    "EFFET DIABOLIQUE ! Le ballon change de trajectoire en plein vol côté gauche !",
-                    "UNE VRAIE ARME ! Frappe lourde qui explose dans le filet gauche !",
-                    "DÉPART EXPRESS ! Le gardien n'a même pas vu passer le ballon à sa gauche !"
+                    "*🎙️: UNE FRAPPE ASSASSINE ! Le ballon transperce la défense côté gauche !*",
+                    "*🎙️: FROID COMME UN GLACON ! Le tireur a placé sa frappe à gauche sans pitié !*",
+                    "*🎙️: EFFET DIABOLIQUE ! Le ballon change de trajectoire en plein vol côté gauche !*",
+                    "*🎙️: UNE VRAIE ARME ! Frappe lourde qui explose dans le filet gauche !*",
+                    "*🎙️: DÉPART EXPRESS ! Le gardien n'a même pas vu passer le ballon à sa gauche !*"
                 ]
             },
             haut: [
-                `UN CANON ! La barre transversale à ${hauteur}m vient de trembler !`,
-                `DINGUE ! Ce ballon passe à ${hauteur}m - le gardien était impuissant !`,
-                `COMME UN JAVELOT ! Frappe aérienne parfaite à ${hauteur}m de hauteur !`,
-                `UN MOMENT DE PUR GÉNIE ! Le ballon frôle la barre à ${hauteur}m !`,
-                `À LA LIMITE DU POSSIBLE ! Une frappe à ${hauteur}m qui laisse sans voix !`
+                `*🎙️: UN CANON ! La barre transversale à ${hauteur}m vient de trembler !*`,
+                `*🎙️: DINGUE ! Ce ballon passe à ${hauteur}m - le gardien était impuissant !*`,
+                `*🎙️: COMME UN JAVELOT ! Frappe aérienne parfaite à ${hauteur}m de hauteur !*`,
+                `*🎙️: UN MOMENT DE PUR GÉNIE ! Le ballon frôle la barre à ${hauteur}m !*`,
+                `*🎙️: À LA LIMITE DU POSSIBLE ! Une frappe à ${hauteur}m qui laisse sans voix !*`
             ]
         };
 
@@ -181,10 +181,10 @@ async function goal(zk, dest, repondre, texte) {
         });
     } else if (resultat === "arrêt") {
         const messagesArret = [
-            "🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien boxe le ballon⚽ à l'extérieur, Sortie de BUT !",
-            "🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à gauche des buts",
-            "🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m devant les buts",
-            "🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à droite des buts"
+            "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien boxe le ballon⚽ à l'extérieur, Sortie de BUT !*",
+            "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à gauche des buts*",
+            "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m devant les buts*",
+            "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à droite des buts*"
         ];
         const messageArret = messagesArret[Math.floor(Math.random() * messagesArret.length)];
 
