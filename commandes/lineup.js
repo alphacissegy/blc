@@ -3,7 +3,7 @@ const { saveUser, deleteUser, getUserData, updatePlayers, updateStats, resetStat
 
 zokou(
   {
-    nomCom: "lineup",
+    nomCom: "lineup⚽",
     categorie: "Gestion",
   },
   async (dest, zk, commandeOptions) => {
