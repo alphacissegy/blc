@@ -13,6 +13,11 @@ zokou(
     if (!data) return repondre("⚠️ Joueur introuvable.");
 
     if (arg.length <= 1) {
+      await zk.sendMessage(dest, { 
+            video: { url: "https://files.catbox.moe/z64kuq.mp4" }, 
+            caption: "",
+            gifPlayback: true 
+        });
       const lineup = `░░ *👥SQUAD⚽🥅*: ${data.nom}
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▱▱▱▱
 1  👤(AG) ${data.joueur1} : ${data.stat1}%🫀
