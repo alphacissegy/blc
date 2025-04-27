@@ -13,20 +13,20 @@ zokou(
     if (!data) return repondre("⚠️ Joueur introuvable.");
 
     if (arg.length <= 1) {
-      const lineup = `🥅⚽LINEUP: ${data.nom}
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-1 👤(AG) ${data.joueur1} : ${data.stat1}%🫀
-2 👤(AC) ${data.joueur2} : ${data.stat2}%🫀
-3 👤(AD) ${data.joueur3} : ${data.stat3}%🫀
-4 👤(MG) ${data.joueur4} : ${data.stat4}%🫀
-5 👤(MC) ${data.joueur5} : ${data.stat5}%🫀
-6 👤(MD) ${data.joueur6} : ${data.stat6}%🫀
-7 👤(DG) ${data.joueur7} : ${data.stat7}%🫀
-8 👤(DC) ${data.joueur8} : ${data.stat8}%🫀
-9 👤(DD) ${data.joueur9} : ${data.stat9}%🫀
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-*REMPLAÇANTS🥅*:
-10 👤${data.joueur10}
+      const lineup = `░░ *👥SQUAD⚽🥅*: ${data.nom}
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▱▱▱▱
+1  👤(AG) ${data.joueur1} : ${data.stat1}%🫀
+2  👤(AC) ${data.joueur2} : ${data.stat2}%🫀
+3  👤(AD) ${data.joueur3} : ${data.stat3}%🫀
+4  👤(MG) ${data.joueur4} : ${data.stat4}%🫀
+5  👤(MC) ${data.joueur5} : ${data.stat5}%🫀
+6  👤(MD) ${data.joueur6} : ${data.stat6}%🫀
+7  👤(DG) ${data.joueur7} : ${data.stat7}%🫀
+8  👤(DC) ${data.joueur8} : ${data.stat8}%🫀
+9  👤(DD) ${data.joueur9} : ${data.stat9}%🫀
+10 👤(GB) ${data.joueur10} : ${data.stat10}%🫀
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▱▱▱▱
+*🔷BENCH🥅*:
 11 👤${data.joueur11}
 12 👤${data.joueur12}
 13 👤${data.joueur13}
@@ -34,7 +34,10 @@ zokou(
 15 👤${data.joueur15}
 
 ⚽🔷*BLUE LOCK NEO🥅*▱▱▱`;
-      return repondre(lineup);
+      return await zk.sendMessage(dest, {
+          image: { url: "https://files.catbox.moe/p94q3m.jpg" },
+          caption: lineup
+        });
     }
     
     // Analyse des arguments pour mise à jour
