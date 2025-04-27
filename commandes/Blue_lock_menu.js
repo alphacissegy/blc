@@ -124,3 +124,24 @@ zokou(
     }
   }
 );
+
+zokou(
+  {
+    nomCom: 'pave⚽',
+    categorie: 'Other'
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre } = commandeOptions;
+
+    repondre(`*🔷 GAMING CONTROLLER🎮*
+░░░░░░░░░░░░░░
+▔▔▔▔▔▔▔▔▔▔▔▔▔⚽🥅
+💬: 
+_________________
+
+⚽ 
+
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+          *⚽🔷BLUE LOCK NEO🥅▱▱▱*`);
+  }
+);
