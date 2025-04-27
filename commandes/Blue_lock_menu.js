@@ -1,90 +1,126 @@
 const { zokou } = require('../framework/zokou');
 
 zokou(
-    {
-        nomCom: 'bluelock🔷',
-        categorie: 'Other'
-    },
-    async (dest, zk, commandeOptions) => {
-        const { repondre, arg, ms } = commandeOptions;
+  {
+    nomCom: 'bluelock⚽',
+    categorie: 'Other'
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre, arg, ms } = commandeOptions;
 
-        if (!arg || arg.length === 0) {
-            const lienImage = 'https://files.catbox.moe/ol0i4m.jpg';
-            const lienGif = 'https://files.catbox.moe/0ua28c.mp4';
+    if (!arg || arg.length === 0) {
+      try {
+        const lienImage = 'https://files.catbox.moe/uistkq.jpg';
+        const lienGif = 'https://files.catbox.moe/z64kuq.mp4';
 
-            const frames = [
-                "▱▱▱▱▱▱▱▱▱▱ 🔷0%",
-                "▰▱▱▱▱▱▱▱▱▱ 🔷10%",
-                "▰▰▱▱▱▱▱▱▱▱ 🔷20%",
-                "▰▰▰▱▱▱▱▱▱▱ 🔷30%",
-                "▰▰▰▰▱▱▱▱▱▱ 🔷40%",
-                "▰▰▰▰▰▱▱▱▱▱ 🔷50%",
-                "▰▰▰▰▰▰▱▱▱▱ 🔷60%",
-                "▰▰▰▰▰▰▰▱▱▱ 🔷70%",
-                "▰▰▰▰▰▰▰▰▱▱ 🔷80%",
-                "▰▰▰▰▰▰▰▰▰▱ 🔷90%",
-                "▰▰▰▰▰▰▰▰▰▰ 🔷100%",
-            ];
+        await zk.sendMessage(dest, {
+          video: { url: lienGif },
+          gifPlayback: true,
+          caption: ""
+        });
 
-            try {
-                let imageMessage = await zk.sendMessage(dest, { text: frames[0] });
-
-                for (let i = 1; i < frames.length; i++) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    await zk.sendMessage(dest, {
-                        text: frames[i],
-                        edit: imageMessage.key,
-                    });
-                }
-
-                // On attend un petit moment pour que l'effet soit visible
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                // On envoie maintenant le GIF et l'image
-                await zk.sendMessage(dest, {
-                    video: { url: lienGif },
-                    gifPlayback: true,
-                    caption: ""
-                });
-
-                await zk.sendMessage(dest, {
-                    image: { url: lienImage },
-                    caption: ""
-                });
-
-            } catch (error) {
-                console.error("Erreur lors de l'animation :", error);
-                await zk.sendMessage(dest, { text: "Une erreur s'est produite. 😢" });
-            }
-        }
+        await zk.sendMessage(dest, {
+          image: { url: lienImage },
+          caption: ""
+        });
+      } catch (error) {
+        console.error("Erreur lors de l'animation :", error);
+        await zk.sendMessage(dest, { text: "Une erreur s'est produite. 😢" });
+      }
     }
+  }
 );
 
+zokou(
+  {
+    nomCom: 'modechampions⚽',
+    categorie: 'Other'
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre, arg, ms } = commandeOptions;
 
+    if (!arg || arg.length === 0) {
+      try {
+        const lienGif = 'https://files.catbox.moe/z64kuq.mp4';
+
+        await zk.sendMessage(dest, {
+          video: { url: lienGif },
+          gifPlayback: true,
+          caption: ""
+        });
+
+        await zk.sendMessage(dest, { image: { url: "https://files.catbox.moe/dhkxtt.jpg" }, caption: "" }, { quoted: ms });
+        await zk.sendMessage(dest, { image: { url: "https://files.catbox.moe/juvrgg.jpg" }, caption: "" }, { quoted: ms });
+      } catch (error) {
+        console.error("Erreur lors de modechampions :", error);
+        await zk.sendMessage(dest, { text: "Une erreur est survenue. 😢" });
+      }
+    }
+  }
+);
 
 zokou(
-    {
-        nomCom: 'bluegame🔷',
-        categorie: 'Other'
-    },
-    async (dest, zk, commandeOptions) => {
-        const { repondre, arg, ms } = commandeOptions;
+  {
+    nomCom: 'modehero⚽',
+    categorie: 'Other'
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre, arg, ms } = commandeOptions;
 
-        if (!arg || arg.length === 0) {
-            const liens = [
-                'https://files.catbox.moe/1nvz4f.jpg', 
-                'https://files.catbox.moe/qihh25.jpg',
-                'https://files.catbox.moe/55skbu.jpg', 
-                'https://files.catbox.moe/69eev8.jpg', 
-                'https://files.catbox.moe/6ckd48.jpg', 
-                'https://files.catbox.moe/qnjv5p.jpg', 
-                'https://files.catbox.moe/y90lsj.jpg'
-            ];
-            
-            for (const lien of liens) {
-                await zk.sendMessage(dest, { image: { url: lien }, caption: "" }, { quoted: ms });
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-        }
+    if (!arg || arg.length === 0) {
+      try {
+        const lienGif = 'https://files.catbox.moe/z64kuq.mp4';
+
+        await zk.sendMessage(dest, {
+          video: { url: lienGif },
+          gifPlayback: true,
+          caption: ""
+        });
+
+        await zk.sendMessage(dest, { image: { url: "https://files.catbox.moe/zmzlwt.jpg" }, caption: "" }, { quoted: ms });
+        await zk.sendMessage(dest, { image: { url: "https://files.catbox.moe/hku7ch.jpg" }, caption: "" }, { quoted: ms });
+      } catch (error) {
+        console.error("Erreur lors de modehero :", error);
+        await zk.sendMessage(dest, { text: "Une erreur est survenue. 😢" });
+      }
     }
+  }
+);
+
+zokou(
+  {
+    nomCom: 'bluegame⚽',
+    categorie: 'Other'
+  },
+  async (dest, zk, commandeOptions) => {
+    const { repondre, arg, ms } = commandeOptions;
+
+    if (!arg || arg.length === 0) {
+      try {
+        const lienGif = 'https://files.catbox.moe/z64kuq.mp4';
+
+        await zk.sendMessage(dest, {
+          video: { url: lienGif },
+          gifPlayback: true,
+          caption: ""
+        });
+
+        const liens = [
+          'https://files.catbox.moe/7szc67.jpg',
+          'https://files.catbox.moe/58n7wd.jpg',
+          'https://files.catbox.moe/ixehlk.jpg',
+          'https://files.catbox.moe/58n7wd.jpg',
+          'https://files.catbox.moe/0j8rx1.jpg'
+        ];
+
+        for (const lien of liens) {
+          await zk.sendMessage(dest, { image: { url: lien }, caption: "" }, { quoted: ms });
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      } catch (error) {
+        console.error("Erreur lors de bluegame :", error);
+        await zk.sendMessage(dest, { text: "Une erreur est survenue. 😢" });
+      }
+    }
+  }
 );
