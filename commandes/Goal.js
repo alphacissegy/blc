@@ -73,29 +73,11 @@ async function goal(zk, dest, repondre, texte) {
         resultat = "arrêt";
     }
 
-    const frames = [
-        "▱▱▱▱▱▱▱▱▱▱ 🔷0%",
-        "▰▱▱▱▱▱▱▱▱▱ 🔷10%",
-        "▰▰▱▱▱▱▱▱▱▱ 🔷20%",
-        "▰▰▰▱▱▱▱▱▱▱ 🔷30%",
-        "▰▰▰▰▱▱▱▱▱▱ 🔷40%",
-        "▰▰▰▰▰▱▱▱▱▱ 🔷50%",
-        "▰▰▰▰▰▰▱▱▱▱ 🔷60%",
-        "▰▰▰▰▰▰▰▱▱▱ 🔷70%",
-        "▰▰▰▰▰▰▰▰▱▱ 🔷80%",
-        "▰▰▰▰▰▰▰▰▰▱ 🔷90%",
-        "▰▰▰▰▰▰▰▰▰▰ 🔷100%",
-    ];
-
-    let imageMessage = await zk.sendMessage(dest, { text: frames[0] });
-
-    for (let i = 1; i < frames.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await zk.sendMessage(dest, {
-            text: frames[i],
-            edit: imageMessage.key,
+    await zk.sendMessage(dest, { 
+            video: { url: "https://files.catbox.moe/z64kuq.mp4" }, 
+            caption: "",
+            gifPlayback: true 
         });
-    }
 
     if (resultat === "but") {
         let messageBut = "*🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱\n*";
