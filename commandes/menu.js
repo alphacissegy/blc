@@ -35,7 +35,7 @@ zokou(
     }
 
     menu_info += "*🔷𝚴𝚵𝚯 𝐃𝚵𝛁𝚵𝐋𝚯𝚸𝚸𝚵𝐔𝚪 🖥️*";
-    const lien = 'https://telegra.ph/file/bd75d35e193a7cf0e300a.jpg'; // Add the image URL here if needed
+    const lien = 'https://files.catbox.moe/1ve4m6.jpg'; // Add the image URL here if needed
 
     await zk.sendMessage(dest, { image: { url: lien }, caption: menu_info }, { quoted: ms });
   }
