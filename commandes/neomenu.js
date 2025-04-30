@@ -9,7 +9,7 @@ zokou(
         const { repondre, arg, ms } = commandeOptions;
 
         if (!arg || arg.length === 0)  {
-            const lien = 'https://files.catbox.moe/06hjut.jpg';
+            const lien = 'https://files.catbox.moe/1ve4m6.jpg';
             const msg = '';
             zk.sendMessage(dest, { image: { url: lien }, caption: msg }, { quoted: ms });
         }
