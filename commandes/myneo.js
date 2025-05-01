@@ -10,7 +10,7 @@ zokou(
     const { repondre, arg, auteurMessage, superUser } = commandeOptions;
 
     let userId = auteurMessage;
-    if (arg.length > 1) {
+    if (arg.length >= 1) {
       userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
       if (!userId) return repondre("⚠️ Mentionne un utilisateur.");
     }
@@ -21,7 +21,7 @@ zokou(
         return repondre("⚠️ Aucune donnée trouvée pour cet utilisateur.");
       }
 
-      if (arg.length = 0) {
+      if (arg.length <= 1) {
 
         const myn = `*🎮NEOVERSE🔷 ACCOUNT🪪* ▔▔▔▔▔▔▔▔▔▔▔▔▔ 
 👤User: ${data.user} 
