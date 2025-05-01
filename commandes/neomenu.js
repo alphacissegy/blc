@@ -2,7 +2,7 @@ const { zokou } = require('../framework/zokou');
 
 zokou(
     {
-        nomCom: 'menuneo',
+        nomCom: 'menuneo🔷',
         categorie: 'Other'
     },
     async (dest, zk, commandeOptions) => {
@@ -425,14 +425,14 @@ zokou(
 
 zokou(
     {
-        nomCom: 'gamepass',
+        nomCom: 'gamepass🎮',
         categorie: 'Other'
     },
     async (dest, zk, commandeOptions) => {
         const { repondre, arg, ms } = commandeOptions;
 
         if (!arg || arg.length === 0)  {
-            const lien = 'https://files.catbox.moe/2fb595.jpg';
+            const lien = 'https://files.catbox.moe/17sok6.jpg';
             const msg = ``;
             zk.sendMessage(dest, { image: { url: lien }, caption: msg }, { quoted: ms });
    
@@ -463,7 +463,7 @@ zokou(
 
 zokou(
     {
-        nomCom: 'allstars',
+        nomCom: 'allstars🌀',
         categorie: 'Other'
     },
     async (dest, zk, commandeOptions) => {
