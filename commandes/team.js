@@ -27,7 +27,7 @@ zokou(
 *🎖️Rang:* ${data.rank}
 *💰Argent:* ${data.argent} 💶
 *🏆Puissance d'équipe:* ${data.puissance}⏫
-*🎖️Classement d'équipe:* ${data.classement}🥉
+*🎖️Classement d'équipe:* ${data.classement}
 
 ░░ *📊RECORDS⚽🥅*
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
