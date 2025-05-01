@@ -3,7 +3,7 @@ const { saveUser, deleteUser, updateUser, getUserData } = require("../bdd/myneo"
 
 zokou(
   {
-    nomCom: "myneo",
+    nomCom: "myneo🔷",
     categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
@@ -117,7 +117,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent enregistrer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && ${arg[0].replace("@", "")}@s.whatsapp.net);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
 
     const base = {
@@ -155,7 +155,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent supprimer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && ${arg[0].replace("@", "")}@s.whatsapp.net);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!mention) return repondre("⚠️ Mentionne un utilisateur à supprimer.");
 
     const message = await deleteUser(mention);
