@@ -13,7 +13,7 @@ async function createTable() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS myneo (
         id TEXT PRIMARY KEY,
-        "user" TEXT DEFAULT 'aucun',
+        users TEXT DEFAULT 'aucun',
         tel TEXT DEFAULT 'aucun',
         points_jeu INTEGER DEFAULT 0,
         nc INTEGER DEFAULT 0,
@@ -58,7 +58,7 @@ async function saveUser(id, data = {}) {
     }
 
     const {
-      user = "aucun",
+      users = "aucun",
       tel = id.replace("@s.whatsapp.net", ""),
       points_jeu = 0,
       nc = 0,
@@ -72,7 +72,7 @@ async function saveUser(id, data = {}) {
 
     await client.query(
       `INSERT INTO myneo 
-        (id, user, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium)
+        (id, users, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
       [id, user, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium]
     );
