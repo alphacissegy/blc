@@ -3,7 +3,7 @@ const { saveUser, deleteUser, updateUser, getUserData } = require("../bdd/team")
 
 zokou(
   {
-    nomCom: "team",
+    nomCom: "team⚽",
     categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
