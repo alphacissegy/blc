@@ -4,7 +4,7 @@ const { saveUser, deleteUser, updateUser, getUserData } = require("../bdd/team")
 zokou(
   {
     nomCom: "team",
-    categorie: "Football",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, auteurMessage, superUser } = commandeOptions;
@@ -40,7 +40,7 @@ zokou(
          ⚽🔷 *BLUE LOCK NEO🥅*▱▱▱`;
 
         return await zk.sendMessage(dest, {
-          image: { url: "https://files.catbox.moe/7e4ywa.png" },
+          image: { url: "https://files.catbox.moe/2patx3.jpg" },
           caption: fiche,
         });
       }
@@ -115,7 +115,7 @@ zokou(
 zokou(
   {
     nomCom: "team_s",
-    categorie: "Football",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, superUser } = commandeOptions;
@@ -155,7 +155,7 @@ zokou(
 zokou(
   {
     nomCom: "team_d",
-    categorie: "Football",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, superUser } = commandeOptions;
