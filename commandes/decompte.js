@@ -21,7 +21,8 @@ async function latence({ zk, texte, origineMessage }) {
     const neoTexte = texte.toLowerCase();
 
     // Vérifie si l'utilisateur veut arrêter un décompte
-    if (neoTexte === "stop" || neoTexte.startsWith(`.   ░▒░ *⌬controller📱*░▒░`)) {
+    if (neoTexte === "stop" || neoTexte.endsWith(`. 🔷blue lock neo🥅▱▱▱
+> ©2025 neo next game *launch*`)) {
         await stopCountdown(zk, origineMessage);
         return;
     }
@@ -38,7 +39,7 @@ async function latence({ zk, texte, origineMessage }) {
     }
 
     // Initialisation du décompte
-    let countdownTime = 6 * 60; // 6 minutes en secondes
+    let countdownTime = 5 * 60; // 6 minutes en secondes
     let extraTime = false; // Indicateur pour le temps supplémentaire
 
     const userMatch = texte.match(/@(\d+)/);
