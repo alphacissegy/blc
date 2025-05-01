@@ -19,7 +19,10 @@ async function createTable() {
         nc INTEGER DEFAULT 0,
         np INTEGER DEFAULT 0,
         coupons INTEGER DEFAULT 0,
-        gift_box INTEGER DEFAULT 0
+        gift_box INTEGER DEFAULT 0,
+        all_stars TEXT DEFAULT '',
+        blue_lock TEXT DEFAULT '+Team⚽',
+        elysium TEXT DEFAULT '+ElysiumMe💠'
       );
     `);
     console.log("✅ Table 'myneo' créée avec succès");
@@ -31,19 +34,50 @@ async function createTable() {
 }
 createTable();
 
-// 📌 Enregistrement d’un utilisateur
-async function saveUser(id, pseudo) {
+// 📌 Obtenir les données d’un utilisateur
+async function getUserData(id) {
+  const client = await pool.connect();
+  try {
+    const res = await client.query("SELECT * FROM myneo WHERE id = $1", [id]);
+    return res.rows[0];
+  } catch (err) {
+    console.error("❌ Erreur récupération utilisateur:", err);
+    return null;
+  } finally {
+    client.release();
+  }
+}
+
+// 📌 Enregistrement d’un utilisateur (avec ou sans données personnalisées)
+async function saveUser(id, data = {}) {
   const client = await pool.connect();
   try {
     const result = await client.query("SELECT * FROM myneo WHERE id = $1", [id]);
-    if (result.rows.length === 0) {
-      await client.query(
-        "INSERT INTO myneo (id, user, tel) VALUES ($1, $2, $3)",
-        [id, pseudo, id.replace("@s.whatsapp.net", "")]
-      );
-      return "✅ Joueur enregistré avec succès.";
+    if (result.rows.length > 0) {
+      return "⚠️ Ce joueur est déjà enregistré.";
     }
-    return "⚠️ Ce joueur est déjà enregistré.";
+
+    const {
+      user = "",
+      tel = id.replace("@s.whatsapp.net", ""),
+      points_jeu = 0,
+      nc = 0,
+      np = 0,
+      coupons = 0,
+      gift_box = 0,
+      all_stars = "",
+      blue_lock = "+Team⚽",
+      elysium = "+ElysiumMe💠"
+    } = data;
+
+    await client.query(
+      `INSERT INTO myneo 
+        (id, user, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+      [id, user, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium]
+    );
+
+    return "✅ Joueur enregistré avec succès.";
   } catch (error) {
     console.error("❌ Erreur lors de l'enregistrement:", error);
     return "❌ Une erreur est survenue lors de l'enregistrement.";
@@ -93,4 +127,5 @@ module.exports = {
   saveUser,
   deleteUser,
   updateUser,
+  getUserData,
 };
