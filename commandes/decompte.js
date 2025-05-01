@@ -45,7 +45,14 @@ async function latence({ zk, texte, origineMessage }) {
     const userMatch = texte.match(/@(\d+)/);
     const user = userMatch ? `${userMatch[1]}@s.whatsapp.net` : null;
 
-    await zk.sendMessage(origineMessage, { text: "⏱️ Début de la latence." });
+    const lienGif = 'https://files.catbox.moe/hqh4iz.mp4';
+
+        await zk.sendMessage(dest, {
+          video: { url: lienGif },
+          gifPlayback: true,
+          caption: ""
+        });
+    //await zk.sendMessage(origineMessage, { text: "⏱️ Début de la latence." });
 
     activeCountdowns[origineMessage] = setInterval(async () => {
         countdownTime--;
