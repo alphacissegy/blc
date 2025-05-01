@@ -1,170 +1,135 @@
-const { zokou } = require("../framework/zokou");
-const { saveUser, deleteUser, updateUser, getUserData } = require("../bdd/team");
+const { Pool } = require("pg");
+const s = require("../set");
 
-zokou(
-  {
-    nomCom: "team",
-    categorie: "Football",
-  },
-  async (dest, zk, commandeOptions) => {
-    const { repondre, arg, auteurMessage, superUser } = commandeOptions;
+const pool = new Pool({
+  connectionString: s.DB,
+  ssl: { rejectUnauthorized: false },
+});
 
-    let userId = auteurMessage;
-    if (arg.length >= 1) {
-      userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-      if (!userId) return repondre("⚠️ Mentionne un utilisateur.");
+// 📌 Création de la table `team`
+async function createTable() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS team (
+        id TEXT PRIMARY KEY,
+        user TEXT NOT NULL,
+        team TEXT DEFAULT 'aucune',
+        points_jeu INTEGER DEFAULT 0,
+        rank TEXT DEFAULT 'aucun',
+        argent INTEGER DEFAULT 0,
+        puissance INTEGER DEFAULT 0,
+        classement TEXT DEFAULT 'aucun',
+        wins INTEGER DEFAULT 0,
+        loss INTEGER DEFAULT 0,
+        draws INTEGER DEFAULT 0,
+        championnats INTEGER DEFAULT 0,
+        nel INTEGER DEFAULT 0
+      );
+    `);
+    console.log("✅ Table 'team' créée avec succès");
+  } catch (error) {
+    console.error("❌ Erreur création table:", error);
+  } finally {
+    client.release();
+  }
+}
+createTable();
+
+// 📌 Obtenir les données d’un utilisateur
+async function getUserData(id) {
+  const client = await pool.connect();
+  try {
+    const res = await client.query("SELECT * FROM team WHERE id = $1", [id]);
+    return res.rows[0];
+  } catch (err) {
+    console.error("❌ Erreur récupération utilisateur:", err);
+    return null;
+  } finally {
+    client.release();
+  }
+}
+
+// 📌 Enregistrement d’un utilisateur (avec ou sans données personnalisées)
+async function saveUser(id, data = {}) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("SELECT * FROM team WHERE id = $1", [id]);
+    if (result.rows.length > 0) {
+      return "⚠️ Ce joueur est déjà enregistré.";
     }
 
-    try {
-      let data = await getUserData(userId);
-      if (!data) return repondre("⚠️ Aucune donnée trouvée pour cet utilisateur.");
+    const {
+      user = "",
+      team = "aucune",
+      points_jeu = 0,
+      rank = "aucun",
+      argent = 0,
+      puissance = 0,
+      classement = "aucun",
+      wins = 0,
+      loss = 0,
+      draws = 0,
+      championnats = 0,
+      nel = 0
+    } = data;
 
-      if (arg.length <= 1) {
-        const fiche = `░░ *👤PLAYER🥅⚽*: ${data.user}
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-*🛡️Team:* ${data.team}
-*⬆️Points de jeu:* ${data.points_jeu} XP
-*🎖️Rang:* ${data.rank}
-*💰Argent:* ${data.argent} 💶
-*🏆Puissance d'équipe:* ${data.puissance}⏫
-*🎖️Classement d'équipe:* ${data.classement}🥉
+    await client.query(
+      `INSERT INTO team 
+        (id, user, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+      [id, user, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel]
+    );
 
-░░ *📊RECORDS⚽🥅*
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-⚽Wins: ${data.wins}   ❌Loss: ${data.loss}   🫱🏼‍🫲🏽Draws: ${data.draws}
-🏆Championnats: ${data.championnats}    🏆NEL: ${data.nel}
+    return "✅ Joueur enregistré avec succès.";
+  } catch (error) {
+    console.error("❌ Erreur lors de l'enregistrement:", error);
+    return "❌ Une erreur est survenue lors de l'enregistrement.";
+  } finally {
+    client.release();
+  }
+}
 
-🥅 +Lineup⚽: ⚠️pour voir la formation
-🌍+player⚽: ⚠️pour voir son Hero
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ 
-         ⚽🔷 *BLUE LOCK NEO🥅*▱▱▱`;
-
-        return await zk.sendMessage(dest, {
-          image: { url: "https://files.catbox.moe/7e4ywa.png" },
-          caption: fiche,
-        });
-      }
-
-      if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent actualiser une team.");
-
-      const modifiables = [
-        "user", "team", "points_jeu", "rank",
-        "argent", "puissance", "classement", "wins", "loss", "draws", "championnats", "nel"
-      ];
-
-      let updates = {};
-
-      for (let i = 1; i < arg.length;) {
-        const field = arg[i]?.toLowerCase();
-        const op = arg[i + 1];
-
-        if (!modifiables.includes(field) || !["=", "+", "-"].includes(op)) {
-          i++;
-          continue;
-        }
-
-        const isNumeric = [
-          "points_jeu", "argent", "puissance",
-          "wins", "loss", "draws", "championnats", "nel"
-        ].includes(field);
-
-        let value;
-
-        if (op === "=" && !isNumeric) {
-          let valParts = [];
-          let j = i + 2;
-          while (j < arg.length && !modifiables.includes(arg[j].toLowerCase())) {
-            valParts.push(arg[j]);
-            j++;
-          }
-          value = valParts.join(" ");
-          i = j;
-        } else {
-          value = arg[i + 2];
-          i += 3;
-        }
-
-        if (value !== undefined) {
-          if (isNumeric) {
-            const val = parseInt(value);
-            if (!isNaN(val)) {
-              if (op === "=") updates[field] = val;
-              else if (op === "+") updates[field] = data[field] + val;
-              else if (op === "-") updates[field] = data[field] - val;
-            }
-          } else {
-            if (op === "=") updates[field] = value;
-          }
-        }
-      }
-
-      if (Object.keys(updates).length > 0) {
-        const message = await updateUser(userId, updates);
-        return repondre(message);
-      } else {
-        return repondre("⚠️ Format incorrect ou champ non valide. Exemple : +team @user wins + 2 team = BlueLock Elite");
-      }
-
-    } catch (err) {
-      console.error("❌ Erreur ligne team:", err);
-      return repondre("❌ Une erreur est survenue.");
+// 📌 Suppression d’un utilisateur
+async function deleteUser(id) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("DELETE FROM team WHERE id = $1 RETURNING *", [id]);
+    if (result.rowCount > 0) {
+      return "✅ Joueur supprimé avec succès.";
     }
+    return "⚠️ Joueur introuvable.";
+  } catch (error) {
+    console.error("❌ Erreur lors de la suppression:", error);
+    return "❌ Une erreur est survenue lors de la suppression.";
+  } finally {
+    client.release();
   }
-);
+}
 
-zokou(
-  {
-    nomCom: "team_s",
-    categorie: "Football",
-  },
-  async (dest, zk, commandeOptions) => {
-    const { repondre, arg, superUser } = commandeOptions;
-    if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent enregistrer un joueur.");
+// 📌 Mise à jour des champs de l’utilisateur
+async function updateUser(id, updates) {
+  const client = await pool.connect();
+  try {
+    const keys = Object.keys(updates);
+    const values = Object.values(updates);
+    if (keys.length === 0) return "⚠️ Aucun champ à mettre à jour.";
 
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
+    const setQuery = keys.map((key, i) => `${key} = $${i + 2}`).join(", ");
+    await client.query(`UPDATE team SET ${setQuery} WHERE id = $1`, [id, ...values]);
 
-    const base = {
-      user: "aucun",
-      team: "aucun",
-      points_jeu: 0,
-      rank: "aucun",
-      argent: 0,
-      puissance: 0,
-      classement: "aucun",
-      wins: 0,
-      loss: 0,
-      draws: 0,
-      championnats: 0,
-      nel: 0,
-    };
-
-    for (let i = 1; i < arg.length; i += 2) {
-      const key = arg[i]?.toLowerCase();
-      const val = arg[i + 1];
-      if (key in base) {
-        base[key] = isNaN(val) ? val : parseInt(val);
-      }
-    }
-
-    const message = await saveUser(mention, base);
-    repondre(message);
+    return "✅ Données mises à jour avec succès.";
+  } catch (error) {
+    console.error("❌ Erreur mise à jour utilisateur:", error);
+    return "❌ Une erreur est survenue lors de la mise à jour.";
+  } finally {
+    client.release();
   }
-);
+}
 
-zokou(
-  {
-    nomCom: "team_d",
-    categorie: "Football",
-  },
-  async (dest, zk, commandeOptions) => {
-    const { repondre, arg, superUser } = commandeOptions;
-    if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent supprimer un joueur.");
-
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    if (!mention) return repondre("⚠️ Mentionne un utilisateur à supprimer.");
-
-    const message = await deleteUser(mention);
-    repondre(message);
-  }
-);
+module.exports = {
+  saveUser,
+  deleteUser,
+  updateUser,
+  getUserData,
+};
