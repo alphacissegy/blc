@@ -13,7 +13,7 @@ async function createTable() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS team (
         id TEXT PRIMARY KEY,
-        user TEXT NOT NULL,
+        user TEXT DEFAULT 'aucun',
         team TEXT DEFAULT 'aucune',
         points_jeu INTEGER DEFAULT 0,
         rank TEXT DEFAULT 'aucun',
@@ -60,7 +60,7 @@ async function saveUser(id, data = {}) {
     }
 
     const {
-      user = "",
+      user = "aucun",
       team = "aucune",
       points_jeu = 0,
       rank = "aucun",
