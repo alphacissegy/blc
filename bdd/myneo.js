@@ -74,7 +74,7 @@ async function saveUser(id, data = {}) {
       `INSERT INTO myneo 
         (id, users, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-      [id, user, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium]
+      [id, users, tel, points_jeu, nc, np, coupons, gift_box, all_stars, blue_lock, elysium]
     );
 
     return "✅ Joueur enregistré avec succès.";
