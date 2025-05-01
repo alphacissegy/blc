@@ -20,7 +20,7 @@ zokou(
       if (!data) return repondre("⚠️ Aucune donnée trouvée pour cet utilisateur.");
 
       if (arg.length <= 1) {
-        const fiche = `░░ *👤PLAYER🥅⚽*: ${data.user}
+        const fiche = `░░ *👤PLAYER🥅⚽*: ${data.users}
 ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 *🛡️Team:* ${data.team}
 *⬆️Points de jeu:* ${data.points_jeu} XP
@@ -48,7 +48,7 @@ zokou(
       if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent actualiser une team.");
 
       const modifiables = [
-        "user", "team", "points_jeu", "rank",
+        "users", "team", "points_jeu", "rank",
         "argent", "puissance", "classement", "wins", "loss", "draws", "championnats", "nel"
       ];
 
@@ -125,7 +125,7 @@ zokou(
     if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
 
     const base = {
-      user: "aucun",
+      users: "aucun",
       team: "aucun",
       points_jeu: 0,
       rank: "aucun",
