@@ -78,7 +78,7 @@ async function saveUser(id, data = {}) {
       `INSERT INTO team 
         (id, users, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
-      [id, user, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel]
+      [id, users, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel]
     );
 
     return "✅ Joueur enregistré avec succès.";
