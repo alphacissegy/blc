@@ -121,7 +121,7 @@ zokou(
     if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
 
     const base = {
-      user: "",
+      user: "aucun",
       tel: "",
       points_jeu: 0,
       nc: 0,
