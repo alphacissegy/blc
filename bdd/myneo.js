@@ -13,7 +13,7 @@ async function createTable() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS myneo (
         id TEXT PRIMARY KEY,
-        user TEXT DEFAULT 'aucun',
+        "user" TEXT DEFAULT 'aucun',
         tel TEXT DEFAULT 'aucun',
         points_jeu INTEGER DEFAULT 0,
         nc INTEGER DEFAULT 0,
