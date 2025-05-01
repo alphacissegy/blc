@@ -24,7 +24,7 @@ zokou(
       if (arg.length <= 1) {
 
         const myn = `*🎮NEOVERSE🔷 ACCOUNT🪪* ▔▔▔▔▔▔▔▔▔▔▔▔▔ 
-👤User: ${data.user} 
+👤User: ${data.users} 
 📳Téléphone: ${data.tel} 
 🎮Points de jeux: ${data.points_jeu} 
 🔷NEOcoins: ${data.nc}🔷 
@@ -48,7 +48,7 @@ zokou(
       if (!superUser) return repondre("⚠️ Seuls les membres Premium peuvent actualiser un joueur.");
 
       const modifiables = [
-        "user", "tel", "points_jeu", "nc", "np", "coupons", "gift_box",
+        "users", "tel", "points_jeu", "nc", "np", "coupons", "gift_box",
         "all_stars", "blue_lock", "elysium"
       ];
 
@@ -121,7 +121,7 @@ zokou(
     if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
 
     const base = {
-      user: "aucun",
+      users: "aucun",
       tel: "",
       points_jeu: 0,
       nc: 0,
