@@ -4,7 +4,7 @@ const { saveUser, deleteUser, getUserData, updatePlayers, updateStats, resetStat
 zokou(
   {
     nomCom: "lineup⚽",
-    categorie: "Gestion",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, auteurMessage } = commandeOptions;
@@ -69,7 +69,7 @@ zokou(
 zokou(
   {
     nomCom: "save",
-    categorie: "Gestion",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, superUser } = commandeOptions;
@@ -89,7 +89,7 @@ zokou(
 zokou(
   {
     nomCom: "delete",
-    categorie: "Gestion",
+    categorie: "Other",
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, superUser } = commandeOptions;
