@@ -47,7 +47,7 @@ async function latence({ zk, texte, origineMessage }) {
 
     const lienGif = 'https://files.catbox.moe/hqh4iz.mp4';
 
-        await zk.sendMessage(dest, {
+        await zk.sendMessage(origineMessage, {
           video: { url: lienGif },
           gifPlayback: true,
           caption: ""
