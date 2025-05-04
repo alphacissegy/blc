@@ -161,8 +161,15 @@ async function goal(zk, dest, repondre, texte) {
             "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à droite des buts*"
         ];
         const messageArret = messagesArret[Math.floor(Math.random() * messagesArret.length)];
-        await zk.sendMessage(dest, { caption: messageArret, text: messageArret });
+
+        const videosArrete = [
+            "https://files.catbox.moe/88lylr.mp4"
+        ];
+        const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
+
+        await zk.sendMessage(dest, { video: { url: videosArret }, caption: messageArret, gifPlayback: true });
     }
 }
 
 module.exports = goal;
+
