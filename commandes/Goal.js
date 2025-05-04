@@ -1,87 +1,63 @@
 async function goal(zk, dest, repondre, texte) {
-    if (!texte.toLowerCase().startsWith("🔷⚽duel action de but🥅\n▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔")) {
-        return;
+    if (!texte.toLowerCase().startsWith("🔷⚽duel action de but🥅")) return;
+
+    const tirMatch = texte.match(/🥅Tir\s*=\s*(\d+)\s*(\d+(?:\.\d+)?)m\s*(\d+(?:\.\d+)?)m/i);
+    const gardienMatch = texte.match(/🥅Gardien\s*=\s*(\d+)/i);
+    const zoneMatch = texte.match(/🥅Zone\s*=\s*([\w\s]+)/i);
+    const directionMatch = texte.match(/🥅Direction\s*=\s*(\w+)/i);
+    const distanceMatch = texte.match(/🥅Distance\s*=\s*([\d.]+)m/i);
+
+    if (!tirMatch || !gardienMatch || !zoneMatch || !directionMatch || !distanceMatch) {
+        return repondre("⚠️ Format incorrect. Assure-toi que la fiche est bien remplie.");
     }
 
-    const tirMatch = texte.toLowerCase().match(/🥅tir\s*=\s*(\d+)/);
-    const reflexesMatch = texte.toLowerCase().match(/🥅reflexes\s*=\s*(\d+)/);
-    const vitesseMatch = texte.toLowerCase().match(/🥅vitesse\s*=\s*(\d+)/);
-    const zoneMatch = texte.toLowerCase().match(/🥅zone\s*=\s*([\w\s]+)/);
-    const distanceMatch = texte.toLowerCase().match(/🥅distance\s*=\s*([\d.]+)m/);
-    const hauteurMatch = texte.toLowerCase().match(/🥅hauteur\s*=\s*([\d.]+)m/);
-    const staminaMatch = texte.toLowerCase().match(/🥅stamina\s*=\s*(\d+)%/);
-    const directionMatch = texte.toLowerCase().match(/🥅direction\s*=\s*(\w+)/);
-
-    if (!tirMatch || !reflexesMatch || !vitesseMatch || !zoneMatch || !distanceMatch || !staminaMatch || !directionMatch) {
-        return repondre("⚠️ Format incorrect. Assure-toi que la fiche est bien formatée.");
-    }
-
-    const tir = parseInt(tirMatch[1], 10);
-    const reflexes = parseInt(reflexesMatch[1], 10);
-    const vitesse = parseInt(vitesseMatch[1], 10);
+    const tirPuissance = parseInt(tirMatch[1], 10);
+    const hauteur = parseFloat(tirMatch[2]);
+    const decalage = parseFloat(tirMatch[3]);
+    const gardien = parseInt(gardienMatch[1], 10);
     const zone = zoneMatch[1].trim().toLowerCase();
+    const direction = directionMatch[1].trim().toLowerCase();
     const distance = parseFloat(distanceMatch[1]);
-    const hauteur = parseFloat(hauteurMatch[1]);
-    const stamina = parseInt(staminaMatch[1], 10);
-    const direction = directionMatch[1].toLowerCase();
-
-    let qualiteTir = "🔶 Moyenne";
-    if (stamina >= 30) {
-        qualiteTir = "✅ Parfaite";
-    }
-
-    const statsTir = qualiteTir === "✅ Parfaite" ? tir : tir - 10;
 
     let resultat;
 
-    if (hauteur < 1.70) {
-        resultat = "arrêt";
-    } else if (hauteur > 2.00) {
+    // Cas d’échec automatique : hauteur ou décalage hors limites
+    if (hauteur >= 2 || decalage >= 4) {
         resultat = "arrêt";
     } else if (distance <= 5) {
-        const difference = statsTir - reflexes;
-        if (difference < -5) {
-            resultat = "arrêt";
-        } else if (difference >= -5 && difference < 0) {
-            resultat = Math.random() < 0.1 ? "but" : "arrêt";
-        } else if (difference === 0) {
+        if (tirPuissance > gardien) {
+            resultat = Math.random() < 1.0 ? "but" : "arrêt";
+        } else if (tirPuissance === gardien) {
             resultat = Math.random() < 0.5 ? "but" : "arrêt";
-        } else if (difference > 0 && difference <= 5) {
-            resultat = Math.random() < 0.8 ? "but" : "arrêt";
-        } else if (difference > 5) {
-            resultat = "but";
+        } else {
+            resultat = Math.random() < 0.2 ? "but" : "arrêt";
         }
     } else if (distance > 5 && distance <= 10) {
-        const difference = statsTir - vitesse;
-        if (difference < -5) {
-            resultat = "arrêt";
-        } else if (difference >= -5 && difference < 0) {
-            resultat = Math.random() < 0.1 ? "but" : "arrêt";
-        } else if (difference === 0) {
-            resultat = Math.random() < 0.3 ? "but" : "arrêt";
-        } else if (difference > 0 && difference <= 5) {
+        if (tirPuissance > gardien) {
             resultat = Math.random() < 0.6 ? "but" : "arrêt";
-        } else if (difference > 5) {
-            resultat = Math.random() < 0.9 ? "but" : "arrêt";
+        } else if (tirPuissance === gardien) {
+            resultat = Math.random() < 0.3 ? "but" : "arrêt";
+        } else {
+            resultat = Math.random() < 0.1 ? "but" : "arrêt";
         }
-    } else if (distance > 10) {
-        const difference = statsTir - vitesse;
-        resultat = difference >= 10 ? "but" : "arrêt";
+    } else if (distance > 10 && distance <= 20) {
+        // Tir spécial requis à cette distance
+        if (tirPuissance > gardien) {
+            resultat = "but";
+        } else {
+            resultat = "arrêt";
+        }
     }
-
-    if (direction === "milieu" || direction === "bas") {
-        resultat = "arrêt";
-    }
-
+    
     await zk.sendMessage(dest, { 
-            video: { url: "https://files.catbox.moe/z64kuq.mp4" }, 
-            caption: "",
-            gifPlayback: true 
-        });
+        video: { url: "https://files.catbox.moe/z64kuq.mp4" }, 
+        caption: "",
+        gifPlayback: true 
+    });
 
     if (resultat === "but") {
         let messageBut = "*🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱\n*";
-        
+
         const commentaires = {
             droite: {
                 lucarne: [
@@ -129,13 +105,28 @@ async function goal(zk, dest, repondre, texte) {
                     "*🎙️: DÉPART EXPRESS ! Le gardien n'a même pas vu passer le ballon à sa gauche !*"
                 ]
             },
-            haut: [
-                `*🎙️: UN CANON ! La barre transversale à ${hauteur}m vient de trembler !*`,
-                `*🎙️: DINGUE ! Ce ballon passe à ${hauteur}m - le gardien était impuissant !*`,
-                `*🎙️: COMME UN JAVELOT ! Frappe aérienne parfaite à ${hauteur}m de hauteur !*`,
-                `*🎙️: UN MOMENT DE PUR GÉNIE ! Le ballon frôle la barre à ${hauteur}m !*`,
-                `*🎙️: À LA LIMITE DU POSSIBLE ! Une frappe à ${hauteur}m qui laisse sans voix !*`
-            ]
+            milieu: {
+                haut: [
+                    `*🎙️: UN CANON ! La barre transversale à ${hauteur}m vient de trembler !*`,
+                    `*🎙️: DINGUE ! Ce ballon passe à ${hauteur}m - le gardien était impuissant !*`,
+                    `*🎙️: COMME UN JAVELOT ! Frappe aérienne parfaite à ${hauteur}m de hauteur !*`,
+                    `*🎙️: UN MOMENT DE PUR GÉNIE ! Le ballon frôle la barre à ${hauteur}m !*`,
+                    `*🎙️: À LA LIMITE DU POSSIBLE ! Une frappe à ${hauteur}m qui laisse sans voix !*`
+                ],
+                miHauteur: [
+                    "*🎙️: UNE FRAPPE PARFAITE ! Le ballon file à mi-hauteur et se loge parfaitement au centre du but !*",
+                    "*🎙️: UN TIR IMPOSSIBLE À DÉVIER ! Frappe précise et maîtrisée à mi-hauteur, le gardien n'a rien pu faire !*",
+                    "*🎙️: CETTE FRAPPE EST IMPRESSIONNANTE ! Au centre du but, à mi-hauteur - parfaitement exécutée !*",
+                    "*🎙️: UN COUP DE GÉNIE ! Le ballon se dirige parfaitement au centre du but à une hauteur idéale !*",
+                    "*🎙️: LA CIBLE EST ATTEINTE ! Le ballon frappe le centre du but à mi-hauteur et fait trembler les filets !*"
+                ],
+                bas: [
+                    "*🎙️: QUELLE VOLONTÉ ! Une frappe au ras du sol qui surprend le gardien !*",
+                    "*🎙️: IMPRESSIONNANT ! Le ballon passe entre les jambes du gardien et termine au fond des filets !*",
+                    "*🎙️: MAGISTRAL ! Une frappe basse que même un chat ne pourrait arrêter !*",
+                    "*🎙️: UN CHOC ! Le gardien n'a pas eu le temps de réagir, trop rapide !*"
+                ]
+            }
         };
 
         let commentaire;
@@ -143,8 +134,9 @@ async function goal(zk, dest, repondre, texte) {
             const zoneKey = zone === "mi-hauteur" ? "miHauteur" : zone;
             const listeCommentaires = commentaires[direction][zoneKey];
             commentaire = listeCommentaires[Math.floor(Math.random() * listeCommentaires.length)];
-        } else if (direction === "haut") {
-            commentaire = commentaires.haut[Math.floor(Math.random() * commentaires.haut.length)];
+        } else if (direction === "milieu") {
+            const zoneKey = zone === "haut" ? "haut" : zone === "bas" ? "bas" : "miHauteur";
+            commentaire = commentaires[direction][zoneKey][Math.floor(Math.random() * commentaires[direction][zoneKey].length)];
         }
 
         messageBut += commentaire;
@@ -169,13 +161,7 @@ async function goal(zk, dest, repondre, texte) {
             "*🥅:❌MISSED GOAL!!! ▱▱▱▱\nLe gardien repousse le ballon dans la surface de réparation à 3m à droite des buts*"
         ];
         const messageArret = messagesArret[Math.floor(Math.random() * messagesArret.length)];
-
-        const videosArrete = [
-            "https://files.catbox.moe/88lylr.mp4"
-        ];
-        const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
-
-        await zk.sendMessage(dest, { video: { url: videosArret }, caption: messageArret, gifPlayback: true });
+        await zk.sendMessage(dest, { caption: messageArret, text: messageArret });
     }
 }
 
