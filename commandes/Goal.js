@@ -35,10 +35,10 @@ async function goal(zk, dest, repondre, texte) {
         gifPlayback: true 
     });
 
-    if (resultat === "but") {
-        let messageBut = "*🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱*\n";
+if (resultat === "but") {
+    let messageBut = "*🥅:✅GOOAAAAAL!!!⚽⚽⚽ ▱▱▱▱*\n";
 
-        const commentaires = {
+    const commentaires = {
             "lucarne droite": [
                 "*🎙️: COMME UN MISSILE GUIDÉ ! Le ballon se niche dans la lucarne droite - splendide !*",
                 "*🎙️: UNE FRAPPE POUR L'HISTOIRE ! La lucarne droite explose sous l'effet de la frappe !*"
@@ -70,23 +70,31 @@ async function goal(zk, dest, repondre, texte) {
                 "*🎙️: UNE FINALE DE CLASSE ! Le ballon fuse au sol, en plein centre !*"
             ]
         };
-        
-const videosBute = [
-            "https://files.catbox.moe/chcn2d.mp4",
-            "https://files.catbox.moe/t04dmz.mp4",
-            "https://files.catbox.moe/8t1eya.mp4"
-        ];
-        const videosBut = videosBute[Math.floor(Math.random() * videosBute.length)];
 
-        await zk.sendMessage(dest, { 
-            video: { url: videosBut }, 
-            caption: `${messageBut}${commentaire}`,
-            gifPlayback: true 
-        });
-    } else {
-        const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
-        await zk.sendMessage(dest, { video: { url: "https://files.catbox.moe/88lylr.mp4" }, caption: "*🥅:❌MISSED GOAL!!! ▱▱▱▱*\n*Le gardien repousse le ballon*", gifPlayback: true });
-    }
+    const optionsCommentaire = commentaires[zone] || ["*🎙️: QUEL TIR !*"];
+    const commentaire = optionsCommentaire[Math.floor(Math.random() * optionsCommentaire.length)];
+
+    const videosBute = [
+        "https://files.catbox.moe/chcn2d.mp4",
+        "https://files.catbox.moe/t04dmz.mp4",
+        "https://files.catbox.moe/8t1eya.mp4"
+    ];
+    const videosBut = videosBute[Math.floor(Math.random() * videosBute.length)];
+
+    await zk.sendMessage(dest, { 
+        video: { url: videosBut }, 
+        caption: `${messageBut}${commentaire}`,
+        gifPlayback: true 
+    });
+} else {
+    const videosArrete = [
+        "https://files.catbox.moe/88lylr.mp4"
+    ];
+    const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
+
+    await zk.sendMessage(dest, { 
+        video: { url: videosArret }, 
+        caption: "*🥅:❌MISSED GOAL!!! ▱▱▱▱*\n*Le gardien repousse le ballon*", 
+        gifPlayback: true 
+    });
 }
-
-module.exports = goal;
