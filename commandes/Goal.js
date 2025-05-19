@@ -98,3 +98,5 @@ if (resultat === "but") {
     });
 }
 }
+
+module.exports = goal;
