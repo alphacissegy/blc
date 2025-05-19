@@ -93,7 +93,7 @@ if (resultat === "but") {
 } else {
     await zk.sendMessage(dest, { 
         video: { url: 'https://files.catbox.moe/88lylr.mp4' }, 
-        caption: "*🥅:❌MISSED GOAL!!! ▱▱▱▱*\n*Le gardien repousse le ballon*", 
+        caption: "*🥅:❌MISSED GOAL!!! ▱▱▱▱*", 
         gifPlayback: true 
     });
 }
