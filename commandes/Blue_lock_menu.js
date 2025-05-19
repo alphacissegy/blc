@@ -106,10 +106,10 @@ zokou(
         });
 
         const liens = [
-          'https://files.catbox.moe/00pual.jpg', 
+          'https://files.catbox.moe/m4kp6t.jpg', 
           'https://files.catbox.moe/7szc67.jpg',
           'https://files.catbox.moe/58n7wd.jpg',
-          'https://i.imgur.com/3Ir0XF7.jpeg',
+          'https://files.catbox.moe/2nq724.jpg',
           'https://files.catbox.moe/0j8rx1.jpg'
         ];
 
