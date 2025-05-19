@@ -13,7 +13,7 @@ const generateRandomNumbers = (min, max, count) => {
 };
 
 const generateRewards = () => {
-  const rewards = ['10🔷', '50.000 G🧭', '10🎟'];
+  const rewards = ['5🔷', '10.000 G🧭', '5🎟'];
   return rewards.sort(() => 0.5 - Math.random()).slice(0, 3);
 };
 
@@ -56,26 +56,30 @@ zokou(
           let valeur_nc = parseInt(result_nc.rows[0][user.cln_neocoins]);
           let valeur_golds = parseInt(result_golds.rows[0][user.cln_golds]);
           let valeur_coupons = parseInt(result_coupons.rows[0][user.cln_coupons]);
-console.log({ result_np, result_nc, result_golds, result_coupons, valeur_coupons, valeur_golds, valeur_nc, valeur_np });
-let numbers = generateRandomNumbers(0, 50, 50);
+ let numbers = generateRandomNumbers(0, 50, 50);
           let winningNumbers = generateRandomNumbers(0, 50, 3);
           let rewards = generateRewards();
           //repondre(winningNumbers.join(', '));
-          let liena = 'https://telegra.ph/file/9a411be3bf362bd0bcea4.jpg';
-          let msga = `*🎰𝗧𝗘𝗡𝗧𝗘𝗭 𝗩𝗢𝗧𝗥𝗘 𝗖𝗛𝗔𝗡𝗖𝗘🥳 !!*
-▭▬▭▬▭▬▭▬▭▬▭▬▭▬▭▬🎉🎉🎉
-jouez à la roulette des chiffres et obtenez une récompense pour le bon numéro que vous choisissez parmi les *5️⃣0️⃣*. *⚠️vous avez 2 tentatives et pour jouer vous devez payer 2🔶*
-▔▔🎊▔🎊▔🎊▔▔🎊▔▔🎊▔🎊▔🎊
-*\`${numbers.join(', ')}\`*
-▔▔🎊▔🎊▔🎊▔▔🎊▔▔🎊▔🎊▔🎊
-▭▬▭▬▭▬▭▬▭▬▭▬▭▬▭▬🎉🎉🎉
-*\`+Cadeaux\`* (🎁 Pour voir les Récompenses possibles)
+          let msga = `*🎰𝗧𝗘𝗡𝗧𝗘𝗭 𝗩𝗢𝗧𝗥𝗘 𝗖𝗛𝗔𝗡𝗖𝗘🥳 !!*🎉🎉
+▭▬▭▬▭▬▭▬▭▬▭▬════░▒▒▒▒░░▒░
+                           
+Bienvenue dans la Roulette, choisissez un chiffre parmis les *5️⃣0️⃣*. Si vous choisissez le bon chiffre alors vous gagnez une récompense 🎁. *⚠️Vous avez 2 chances pour choisir le bon numéro*. 
+🎊▔▔🎊▔🎊▔🎊▔▔🎊▔▔🎊▔🎊▔🎊
+*\`${numbers.join(', ')}\`*. ▱▱▱ ▱▱▱ ▱▱▱ ▱▱▱
+🎊▔▔🎊▔🎊▔🎊▔▔🎊▔▔🎊▔🎊▔🎊
+             🎁5🔷  🎁10.000 🧭  🎁5🎫  
+⚠️Vous pouvez booster votre récompense avec des NC🔷 avant le début du jeu, vous devez donc préciser au maître du jeu que vous voulez utiliser un Boost de tant. 
+×2 = 5🔷
+x5 = 10🔷
+x10 = 20🔷
+×20 = 50🔷
 
 *🎊Voulez-vous tenter votre chance ?* (1min)
 ✅: \`Oui\`
-❌: \`Non\``; // Texte complet
+❌: \`Non\`
+                                          ══░▒▒▒▒░░▒░`; // Texte complet
 
-          await zk.sendMessage(origineMessage, { image: { url: liena }, caption: msga }, { quoted: ms });
+          await zk.sendMessage(origineMessage, { video: { url: 'https://files.catbox.moe/amtfgl.mp4' }, caption: msga, gifPlayback: true }, { quoted: ms });
 
           const getConfirmation = async (attempt = 1) => {
             if (attempt > 3) {
@@ -122,8 +126,8 @@ jouez à la roulette des chiffres et obtenez une récompense pour le bon numéro
             if (valeur_np < 1) {
               return  repondre('Nombre de Neo points insuffisant');
             } else {
-              await client.query(user.upd_np, [valeur_np - 1]);   
-              //repondre('np retiré');
+              await client.query(user.upd_neocoins, [valeur_nc - 1]);   
+              //repondre('nc retiré');
             }
           } catch (error) {
             return; // Gestion de l'erreur, jeu annulé
@@ -180,18 +184,19 @@ jouez à la roulette des chiffres et obtenez une récompense pour le bon numéro
             if (winningNumbers.includes(number)) {
               let rewardIndex = winningNumbers.indexOf(number);
               let reward = rewards[rewardIndex];
-              let msgc = `🎊🥳😍 ▭▬▭▬▭▬▭▬▭▬▭▬▭▬▭▬*✅EXCELLENT! C'était le bon numéro ${reward}! Vas-y tu peux encore gagner plus ▭▬▭▬▭▬▭▬▭▬▭▬▭▬▭▬😍🥳🎊`; // Message de victoire
-              let lienc = 'https://telegra.ph/file/dc157f349cd8045dff559.jpg';
+              let msgc = `🎰FÉLICITATIONS ! 🥳🥳 vous avez gagner +${reward} 🎁🎊
+══░▒▒▒▒░░▒░`; // Message de victoire
+              let lienc = 'https://files.catbox.moe/vfv2hk.mp4';
 
               switch (reward) {
-                case '10🔷':
-                  await client.query(user.upd_neocoins, [valeur_nc + 10]);
+                case '5🔷':
+                  await client.query(user.upd_neocoins, [valeur_nc + 5]);
                   break;
-                case '50.000 G🧭':
-                  await client.query(user.upd_golds, [valeur_golds + 50000]);
+                case '10.000 G🧭':
+                  await client.query(user.upd_golds, [valeur_golds + 10000]);
                   break;
-                case '10🎟':
-                  await client.query(user.upd_coupons, [valeur_coupons + 10]);
+                case '5🎟':
+                  await client.query(user.upd_coupons, [valeur_coupons + 5]);
                   break;
                 default:
                   await repondre('Récompense inconnue');
@@ -201,8 +206,9 @@ jouez à la roulette des chiffres et obtenez une récompense pour le bon numéro
             } else {
               if (isSecondChance) {
                 // Message d'échec final après la deuxième tentative
-                let msgd = `😫😖💔 ▭▬▭▬▭▬▭▬▭▬▭▬❌NON ! C'était le mauvais numéro ! Dommage tu y étais presque💔▭▬▭▬▭▬▭▬▭▬▭▬😫😖💔`;
-                let liend = 'https://telegra.ph/file/222cefbcd18ba50012d05.jpg';
+                let msgd = `🎰❌❌SORRY ! 😖😣 Mauvais numéro💔💔💔💔. T'abandonne ? 😝
+══░▒▒▒▒░░▒░`;
+                let liend = 'https://files.catbox.moe/hmhs29.mp4';
                 return { success: false, message: msgd, image: liend };
               } else {
                 // Ne rien envoyer après le premier échec
@@ -228,10 +234,10 @@ jouez à la roulette des chiffres et obtenez une récompense pour le bon numéro
                 const result2 = await checkWinningNumber(true, chosenNumber2);
 
                 if (result2.success) {
-                  await zk.sendMessage(origineMessage, { image: { url: result2.image }, caption: result2.message }, { quoted: ms });
+                  await zk.sendMessage(origineMessage, { video: { url: result2.image }, caption: result2.message, gifPlayback: true }, { quoted: ms });
                 } else {
                   if (result2.message) {
-                    await zk.sendMessage(origineMessage, { image: { url: result2.image }, caption: result2.message }, { quoted: ms });
+                    await zk.sendMessage(origineMessage, { video: { url: result2.image }, caption: result2.message, gifPlayback: true }, { quoted: ms });
                   }
                 }
               } catch (error) {
