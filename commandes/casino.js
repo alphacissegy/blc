@@ -143,10 +143,10 @@ x10 = 20🔷
               ? '🎊😃: *Vous avez une deuxième chance ! Choisissez un autre numéro. Vous avez 1 min ⚠️* (Répondre à ce message)'
               : '🎊😃: *Choisissez un numéro. Vous avez 1 min ⚠️* (Répondre à ce message)';
             let lien = isSecondChance 
-              ? 'https://i.ibb.co/SPY5b86/image.jpg'
-              : 'https://telegra.ph/file/9a411be3bf362bd0bcea4.jpg';
+              ? 'https://files.catbox.moe/amtfgl.mp4'
+              : 'https://files.catbox.moe/amtfgl.mp4';
 
-            await zk.sendMessage(origineMessage, { image: { url: lien }, caption: msg }, { quoted: ms });
+            await zk.sendMessage(origineMessage, { video: { url: lien }, caption: msg, gifPlayback: true }, { quoted: ms });
 
             try {
               const rep = await zk.awaitForMessage({
@@ -222,11 +222,11 @@ x10 = 20🔷
             const result1 = await checkWinningNumber(false, chosenNumber1);
 
             if (result1.success) {
-              await zk.sendMessage(origineMessage, { image: { url: result1.image }, caption: result1.message }, { quoted: ms });
+              await zk.sendMessage(origineMessage, { video: { url: result1.image }, caption: result1.message, gifPlayback: true }, { quoted: ms });
             } else {
               // Si échec à la première tentative, proposer une deuxième chance
               if (result1.message) {
-                await zk.sendMessage(origineMessage, { image: { url: result1.image }, caption: result1.message }, { quoted: ms });
+                await zk.sendMessage(origineMessage, { video: { url: result1.image }, caption: result1.message, gifPlayback: true }, { quoted: ms });
               }
 
               try {
