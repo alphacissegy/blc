@@ -87,13 +87,8 @@ if (resultat === "but") {
         gifPlayback: true 
     });
 } else {
-    const videosArrete = [
-        "https://files.catbox.moe/88lylr.mp4"
-    ];
-    const videosArret = videosArrete[Math.floor(Math.random() * videosArrete.length)];
-
     await zk.sendMessage(dest, { 
-        video: { url: videosArret }, 
+        video: { url: 'https://files.catbox.moe/88lylr.mp4' }, 
         caption: "*🥅:❌MISSED GOAL!!! ▱▱▱▱*\n*Le gardien repousse le ballon*", 
         gifPlayback: true 
     });
