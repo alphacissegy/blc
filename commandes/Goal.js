@@ -12,7 +12,7 @@ async function goal(zk, dest, repondre, texte) {
 
     const tirPuissance = parseInt(tirMatch[1], 10);
     const gardien = parseInt(gardienMatch[1], 10);
-    const zone = zoneMatch[1].trim().toLowerCase(); // ex: "lucarne droite"
+    const zone = zoneMatch[1].trim().toLowerCase().replace(/\s+/g, ' ');  // ex: "lucarne droite"
     const distance = parseFloat(distanceMatch[1]);
 
     let resultat;
@@ -71,6 +71,10 @@ if (resultat === "but") {
             ]
         };
 
+    if (!commentaires[zone]) {
+    await repondre(`Zone inconnue : *${zone}*\nZones valides :\n- ${Object.keys(commentaires).join("\n- ")}`);
+    return;
+ }
     const optionsCommentaire = commentaires[zone] || ["*🎙️: QUEL TIR !*"];
     const commentaire = optionsCommentaire[Math.floor(Math.random() * optionsCommentaire.length)];
 
