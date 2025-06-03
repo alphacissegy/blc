@@ -26,7 +26,7 @@ async function createJidLidTable() {
     client.release();
   }
 }
-
+createJidLidTable();
 // Ajout ou mise à jour d'une paire jid <=> lid
 async function upsertJidLid(jid, lid) {
   if (!jid || !lid) return false;
