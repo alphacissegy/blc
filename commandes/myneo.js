@@ -11,7 +11,7 @@ zokou(
 
     let userId = auteurMessage;
     if (arg.length >= 1) {
-      userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+      userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
       if (!userId) return repondre("⚠️ Mentionne un utilisateur.");
     }
 
@@ -117,7 +117,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent enregistrer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
     if (!mention) return repondre("⚠️ Mentionne un utilisateur.");
 
     const base = {
@@ -155,7 +155,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent supprimer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
     if (!mention) return repondre("⚠️ Mentionne un utilisateur à supprimer.");
 
     const message = await deleteUser(mention);
