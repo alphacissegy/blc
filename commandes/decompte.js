@@ -43,7 +43,7 @@ async function latence({ zk, texte, origineMessage }) {
     let extraTime = false; // Indicateur pour le temps supplémentaire
 
     const userMatch = texte.match(/@(\d+)/);
-    const user = userMatch ? `${userMatch[1]}@s.whatsapp.net` : null;
+    const user = userMatch ? `${userMatch[1]}@lid` : null;
 
     const lienGif = 'https://files.catbox.moe/hqh4iz.mp4';
 
