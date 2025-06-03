@@ -172,7 +172,8 @@ async function main() {
         auteurMsgRepondu,
         ms,
         origineMessage,
-        mybotpic
+        mybotpic,
+        jidToLid
       };
         console.log(`NEOverse_md
 ${verifGroupe ? `Message provenant du groupe : ${nomGroupe}\n` : ''}Message envoyé par : [${nomAuteurMessage} : ${auteurMessage.split('@s.whatsapp.net')[0]}]
