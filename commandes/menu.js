@@ -58,6 +58,33 @@ zokou({ nomCom: "jid", categorie: "Other" }, async (dest, zk, commandeOptions) =
 
         }) ;
 
+
+zokou({ nomCom: "jidtolid", categorie: "Other" }, async (dest, zk, commandeOptions) => {
+  const { arg, ms, repondre, msgRepondu, superUser, jidToLid, auteurMsgRepondu } = commandeOptions;
+
+  if (!superUser) {
+    return repondre("Commande réservée au propriétaire du bot.");
+  }
+
+  let jid;
+
+  if (arg[0]) {
+    // Ajoute @s.whatsapp.net à l'argument s'il n'est pas déjà complet
+    jid = arg[0].includes("@s.whatsapp.net") ? arg[0] : arg[0] + "@s.whatsapp.net";
+  } else if (msgRepondu) {
+    jid = auteurMsgRepondu;
+  } else {
+    jid = dest;
+  }
+
+  try {
+    const lid = await jidToLid(jid);
+    zk.sendMessage(dest, { text: `🔎 *JID* : ${jid}\n🔐 *LID* : ${lid}` }, { quoted: ms });
+  } catch (e) {
+    repondre("❌ Erreur lors de la conversion. JID invalide.");
+  }
+});
+
 zokou({
   nomCom: 'sudo',
   categorie: 'Other',
