@@ -177,7 +177,7 @@ async function main() {
         JidToLid
       };
         console.log(`NEOverse_md
-${verifGroupe ? `Message provenant du groupe : ${nomGroupe}\n` : ''}Message envoyé par : [${nomAuteurMessage} : ${auteurMessage.split('@s.whatsapp.net')[0]}]
+${verifGroupe ? `Message provenant du groupe : ${nomGroupe}\n` : ''}Message envoyé par : [${nomAuteurMessage} : ${auteurMessage.split('@lid')[0]}]
 Type de message : ${mtype}
 Contenu du message.....
 ${texte}`);
