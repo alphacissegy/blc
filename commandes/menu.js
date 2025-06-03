@@ -99,18 +99,14 @@ zokou({ nomCom: "upjid", categorie: "Other" }, async (dest, zk, options) => {
     return;
   }
 
-  // Construire le jid complet
-  const jid = arg.trim() + "@s.whatsapp.net";
+  const jid = arg[0].trim() + "@s.whatsapp.net";
 
-  // Récupérer le lid via ta fonction jidToLid
-  const lid = await jidToLid(jid); // passer zk ou ovl selon ta fonction
-
+  const lid = await JidToLid(jid);
   if (!lid) {
     repondre(`Impossible de récupérer le lid pour le jid : ${jid}`);
     return;
   }
 
-  // Stocker dans la BDD
   const result = await upsertJidLid(jid, lid);
   if (result) {
     repondre(`Relation jid-lid sauvegardée avec succès :\njid = ${jid}\nlid = ${lid}`);
