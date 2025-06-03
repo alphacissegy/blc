@@ -83,7 +83,7 @@ async function main() {
       async function JidToLid(j) {
         try {
           if (!j) return null;
-          const lid = await getLid(j, ovl);
+          const lid = await getLid(j, zk);
           return lid || j;
         } catch (e) {
           console.error("Erreur JID -> LID :", e.message);
