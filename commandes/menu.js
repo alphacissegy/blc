@@ -1,6 +1,7 @@
 const { zokou } = require("../framework/zokou");
 const s = require("../set");
 const {removeSudoNumber,addSudoNumber,issudo} = require("../bdd/sudo");
+const { upsertJidLid } = require("../bdd/cache_jid");
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const fs = require('fs');
 const path = require('path');
@@ -82,6 +83,39 @@ zokou({ nomCom: "jidtolid", categorie: "Other" }, async (dest, zk, commandeOptio
     zk.sendMessage(dest, { text: `🔎 *JID* : ${jid}\n🔐 *LID* : ${lid}` }, { quoted: ms });
   } catch (e) {
     repondre("❌ Erreur lors de la conversion. JID invalide.");
+  }
+});
+
+zokou({ nomCom: "upjid", categorie: "Other" }, async (dest, zk, options) => {
+  const { arg, ms, repondre, jidToLid, superUser } = options;
+
+  if (!superUser) {
+    repondre("Commande réservée au propriétaire du bot");
+    return;
+  }
+
+  if (!arg || arg.length === 0) {
+    repondre("Merci de fournir un numéro sans suffixe.");
+    return;
+  }
+
+  // Construire le jid complet
+  const jid = arg.trim() + "@s.whatsapp.net";
+
+  // Récupérer le lid via ta fonction jidToLid
+  const lid = await jidToLid(jid); // passer zk ou ovl selon ta fonction
+
+  if (!lid) {
+    repondre(`Impossible de récupérer le lid pour le jid : ${jid}`);
+    return;
+  }
+
+  // Stocker dans la BDD
+  const result = await upsertJidLid(jid, lid);
+  if (result) {
+    repondre(`Relation jid-lid sauvegardée avec succès :\njid = ${jid}\nlid = ${lid}`);
+  } else {
+    repondre("Erreur lors de la sauvegarde dans la base de données.");
   }
 });
 
