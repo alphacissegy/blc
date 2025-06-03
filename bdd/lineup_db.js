@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const s = require("../set");
+const { getJidFromLid } = require("./cache_jid");
 
 const pool = new Pool({
   connectionString: s.DB,
@@ -27,13 +28,16 @@ async function createTable() {
 }
 createTable()
 
-// 📌 Sauvegarde d'un utilisateur
-async function saveUser(id, nom) {
+// 📌 Sauvegarde d'un utilisateur en convertissant lid → jid
+async function saveUser(lid, nom) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return "⚠️ Impossible de récupérer le JID.";
+
   const client = await pool.connect();
   try {
-    const result = await client.query("SELECT * FROM blue_lock_stats WHERE id = $1", [id]);
+    const result = await client.query("SELECT * FROM blue_lock_stats WHERE id = $1", [jid]);
     if (result.rows.length === 0) {
-      await client.query("INSERT INTO blue_lock_stats (id, nom) VALUES ($1, $2)", [id, nom]);
+      await client.query("INSERT INTO blue_lock_stats (id, nom) VALUES ($1, $2)", [jid, nom]);
       return "✅ Joueur enregistré avec succès.";
     }
     return "⚠️ Ce joueur est déjà enregistré.";
@@ -45,10 +49,13 @@ async function saveUser(id, nom) {
   }
 }
 
-async function deleteUser(id) {
+async function deleteUser(lid) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return "⚠️ Impossible de récupérer le JID.";
+
   const client = await pool.connect();
   try {
-    const result = await client.query("DELETE FROM blue_lock_stats WHERE id = $1 RETURNING *", [id]);
+    const result = await client.query("DELETE FROM blue_lock_stats WHERE id = $1 RETURNING *", [jid]);
     if (result.rowCount > 0) {
       return "✅ Joueur supprimé avec succès.";
     }
@@ -62,10 +69,13 @@ async function deleteUser(id) {
 }
 
 // 📌 Récupération des données d'un joueur
-async function getUserData(id) {
+async function getUserData(lid) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return null;
+
   const client = await pool.connect();
   try {
-    const result = await client.query("SELECT * FROM blue_lock_stats WHERE id = $1", [id]);
+    const result = await client.query("SELECT * FROM blue_lock_stats WHERE id = $1", [jid]);
     return result.rows[0] || null;
   } catch (error) {
     console.error("❌ Erreur récupération données:", error);
@@ -76,17 +86,20 @@ async function getUserData(id) {
 }
 
 // 📌 Mise à jour des joueurs
-async function updatePlayers(userId, updates) {
+async function updatePlayers(lid, updates) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return "⚠️ Impossible de récupérer le JID.";
+
   const client = await pool.connect();
   try {
-    const existingData = await getUserData(userId);
+    const existingData = await getUserData(lid);
     if (!existingData) return "⚠️ Joueur introuvable.";
 
     const updateFields = Object.keys(updates);
     const updateValues = Object.values(updates);
     const setQuery = updateFields.map((key, i) => `${key} = $${i + 2}`).join(", ");
 
-    await client.query(`UPDATE blue_lock_stats SET ${setQuery} WHERE id = $1`, [userId, ...updateValues]);
+    await client.query(`UPDATE blue_lock_stats SET ${setQuery} WHERE id = $1`, [jid, ...updateValues]);
     return `✅ Mises à jour effectuées pour ${existingData.nom}`;
   } catch (error) {
     console.error("❌ Erreur mise à jour joueurs:", error);
@@ -97,16 +110,19 @@ async function updatePlayers(userId, updates) {
 }
 
 // 📌 Mise à jour d'une statistique spécifique
-async function updateStats(userId, statKey, signe, newValue) {
+async function updateStats(lid, statKey, signe, newValue) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return "⚠️ Impossible de récupérer le JID.";
+
   const client = await pool.connect();
   try {
-    const existingData = await getUserData(userId);
+    const existingData = await getUserData(lid);
     if (!existingData) return "⚠️ Joueur introuvable.";
 
     const oldValue = existingData[statKey] || 0; // Prend 0 si aucune valeur existante
     const updatedValue = signe === "+" ? oldValue + newValue : oldValue - newValue;
 
-    await client.query(`UPDATE blue_lock_stats SET ${statKey} = $2 WHERE id = $1`, [userId, updatedValue]);
+    await client.query(`UPDATE blue_lock_stats SET ${statKey} = $2 WHERE id = $1`, [jid, updatedValue]);
 
     return `✅ ${statKey.replace("stat", "Statistique ")} mise à jour : ${oldValue} ${signe} ${newValue} = ${updatedValue} pour ${existingData.nom}`;
   } catch (error) {
@@ -118,15 +134,18 @@ async function updateStats(userId, statKey, signe, newValue) {
 }
 
 // 📌 Réinitialisation des statistiques
-async function resetStats(userId) {
+async function resetStats(lid) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) return "⚠️ Impossible de récupérer le JID.";
+
   const client = await pool.connect();
   try {
-    const existingData = await getUserData(userId);
+    const existingData = await getUserData(lid);
     if (!existingData) return "⚠️ Joueur introuvable.";
 
     await client.query(
       `UPDATE blue_lock_stats SET ${[...Array(10).keys()].map(i => `stat${i + 1} = 100`).join(", ")} WHERE id = $1`,
-      [userId]
+      [jid]
     );
     return `✅ Toutes les stats ont été remises à 100 pour ${existingData.nom}!`;
   } catch (error) {
