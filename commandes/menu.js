@@ -61,7 +61,7 @@ zokou({ nomCom: "jid", categorie: "Other" }, async (dest, zk, commandeOptions) =
 
 
 zokou({ nomCom: "jidtolid", categorie: "Other" }, async (dest, zk, commandeOptions) => {
-  const { arg, ms, repondre, msgRepondu, superUser, jidToLid, auteurMsgRepondu } = commandeOptions;
+  const { arg, ms, repondre, msgRepondu, superUser, JidToLid, auteurMsgRepondu } = commandeOptions;
 
   if (!superUser) {
     return repondre("Commande réservée au propriétaire du bot.");
@@ -87,7 +87,7 @@ zokou({ nomCom: "jidtolid", categorie: "Other" }, async (dest, zk, commandeOptio
 });
 
 zokou({ nomCom: "upjid", categorie: "Other" }, async (dest, zk, options) => {
-  const { arg, ms, repondre, jidToLid, superUser } = options;
+  const { arg, ms, repondre, JidToLid, superUser } = options;
 
   if (!superUser) {
     repondre("Commande réservée au propriétaire du bot");
