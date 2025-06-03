@@ -1,228 +1,211 @@
-const fs = require('fs');
+const fs = require("fs");
 const pino = require("pino");
-const path = require('path');
+const path = require("path");
 const { exec } = require("child_process");
-const { default: makeWASocket, useMultiFileAuthState, generateWAMessageFromContent, prepareWAMessageMedia, proto, delay, makeCacheableSignalKeyStore, jidDecode, getContentType, downloadContentFromMessage, makeInMemoryStore, fetchLatestBaileysVersion, DisconnectReason } = require("@whiskeysockets/baileys");
+const {
+  default: makeWASocket,
+  makeCacheableSignalKeyStore,
+  Browsers,
+  fetchLatestBaileysVersion,
+  useMultiFileAuthState,
+  getContentType,
+  jidDecode,
+  delay,
+  DisconnectReason
+} = require("@whiskeysockets/baileys");
+
 const boom = require("@hapi/boom");
 const conf = require("./set");
 const session = conf.SESSION_ID || "";
 let evt = require(__dirname + "/framework/zokou");
 let { reagir } = require(__dirname + "/framework/app");
 const axios = require("axios");
-const FileType = require('file-type')
+const FileType = require("file-type");
 const prefixe = conf.PREFIXE || "/";
-//const maine = require('./commandes/elysium_control_bot');
-const latence = require('./commandes/decompte');
-const stats = require('./commandes/stats');
-const loca_test = require('./Elysium/Fallen_Angels/FA');
-const stats_lineup = require('./commandes/lineup');
-const goal = require('./commandes/Goal');
+const latence = require("./commandes/decompte");
+const stats = require("./commandes/stats");
+const loca_test = require("./Elysium/Fallen_Angels/FA");
+const stats_lineup = require("./commandes/lineup");
+const goal = require("./commandes/Goal");
+const getLid = require("./framework/cache");
 
 async function ovlAuth(session) {
-    let sessionId;
-    try {
-        if (session.startsWith("Ovl-MD_") && session.endsWith("_SESSION-ID")) {
-            sessionId = session.slice(7, -11);
-        }
-        const response = await axios.get('https://pastebin.com/raw/' + sessionId);
-        const data = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-        const filePath = path.join(__dirname, 'auth', 'creds.json');
-        if (!fs.existsSync(filePath)) {
-            console.log("Connexion au bot en cours");
-            await fs.writeFileSync(filePath, data, 'utf8'); 
-        } else if (fs.existsSync(filePath) && session !== "ovl") {
-            await fs.writeFileSync(filePath, data, 'utf8');
-        }
-    } catch (e) {
-        console.log("Session invalide: " + e.message || e);
+  let sessionId;
+  try {
+    if (session.startsWith("Ovl-MD_") && session.endsWith("_SESSION-ID")) {
+      sessionId = session.slice(7, -11);
     }
- }
+    const response = await axios.get("https://pastebin.com/raw/" + sessionId);
+    const data = typeof response.data === "string" ? response.data : JSON.stringify(response.data);
+    const filePath = path.join(__dirname, "auth", "creds.json");
+    if (!fs.existsSync(filePath) || (fs.existsSync(filePath) && session !== "ovl")) {
+      console.log("Connexion au bot en cours");
+      await fs.writeFileSync(filePath, data, "utf8");
+    }
+  } catch (e) {
+    console.log("Session invalide: " + (e.message || e));
+  }
+}
+
 ovlAuth(session);
 
 async function main() {
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('./auth');
-    try {
-        const store = makeInMemoryStore({ logger: pino().child({ level: "silent", stream: "store"
-  })
-});
-        const zk = makeWASocket({
-            version, 
-            printQRInTerminal: false,
-            logger: pino({ level: "silent" }),
-            browser: ["Ubuntu", "Chrome", "20.0.04"],
-            fireInitQueries: false,
-            shouldSyncHistoryMessage: true,
-            downloadHistory: true,
-            syncFullHistory: true,
-            generateHighQualityLinkPreview: true,
-            markOnlineOnConnect: false,
-            keepAliveIntervalMs: 30000,
-            auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" }))
-        },
-           getMessage: async (key) => {
-                if (store) {
-                    const msg = await store.loadMessage(key.remoteJid, key.id, undefined);
-                    return msg.message || undefined;
-                }
-                return {
-                    conversation: 'An Error Occurred, Repeat Command!'
-                };
-           }
-        });
-        
-        zk.ev.on("messages.upsert", async (m) => {
-            const { messages } = m;
-            const ms = messages[0];
-            if (!ms.message) return;
-            const decodeJid = (jid) => {
-                if (!jid) return jid;
-                if (/:\d+@/gi.test(jid)) {
-                    let decode = jidDecode(jid) || {};
-                    return decode.user && decode.server && `${decode.user}@${decode.server}` || jid;
-                }
-                return jid;
-            };
+  const { version } = await fetchLatestBaileysVersion();
+  const { state, saveCreds } = await useMultiFileAuthState("./auth");
 
-            var mtype = getContentType(ms.message);
-            var texte = mtype == "conversation" ? ms.message.conversation :
-                mtype == "imageMessage" ? ms.message.imageMessage?.caption :
-                mtype == "videoMessage" ? ms.message.videoMessage?.caption :
-                mtype == "extendedTextMessage" ? ms.message?.extendedTextMessage?.text :
-                mtype == "buttonsResponseMessage" ? ms?.message?.buttonsResponseMessage?.selectedButtonId :
-                mtype == "listResponseMessage" ? ms.message?.listResponseMessage?.singleSelectReply?.selectedRowId :
-                mtype == "messageContextInfo" ? (ms?.message?.buttonsResponseMessage?.selectedButtonId || ms.message?.listResponseMessage?.singleSelectReply?.selectedRowId || ms.text) : "";
+  try {
+    const zk = makeWASocket({
+      version,
+      logger: pino({ level: "silent" }),
+      browser: Browsers.macOS("Safari"),
+      generateHighQualityLinkPreview: true,
+      syncFullHistory: false,
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
+      }
+    });
 
-            var origineMessage = ms.key.remoteJid;
-            var idBot = decodeJid(zk.user.id);
-            var servBot = idBot.split('@')[0];
-            const verifGroupe = origineMessage?.endsWith("@g.us");
-            var infosGroupe = verifGroupe ? await zk.groupMetadata(origineMessage) : "";
-            var nomGroupe = verifGroupe ? infosGroupe.subject : "";
-            var msgRepondu = ms.message.extendedTextMessage?.contextInfo?.quotedMessage;
-            var auteurMsgRepondu = decodeJid(ms.message?.extendedTextMessage?.contextInfo?.participant);
-            var mr = ms.message?.extendedTextMessage?.contextInfo?.mentionedJid;
-            var utilisateur = mr ? mr : msgRepondu ? auteurMsgRepondu : "";
-            var auteurMessage = verifGroupe ? (ms.key.participant ? ms.key.participant : ms.participant) : origineMessage;
-            if (ms.key.fromMe) {
-                auteurMessage = idBot;
-            }
+    zk.ev.on("messages.upsert", async (m) => {
+      if (m.type !== "notify") return;
+      const ms = m.messages?.[0];
+      if (!ms.message) return;
 
-            var membreGroupe = verifGroupe ? ms.key.participant : '';
-            const nomAuteurMessage = ms.pushName;
-            const { getAllSudoNumbers } = require("./bdd/sudo");
-                const fatao = '22651463203';
-                const sudo = await getAllSudoNumbers();
-                const superUserNumbers = [servBot, fatao, conf.NUMERO_OWNER].map((s) => s.replace(/[^0-9]/g) + "@s.whatsapp.net");
-                const allAllowedNumbers = superUserNumbers.concat(sudo);
-                const superUser = allAllowedNumbers.includes(auteurMessage);
-                
-                var dev = [fatao].map((t) => t.replace(/[^0-9]/g) + "@s.whatsapp.net").includes(auteurMessage);
-                
-            const arg = texte ? texte.trim().split(/ +/).slice(1) : null;
-           const verifCom = texte ? texte.startsWith(prefixe) : false;
-          const com = verifCom ? texte.slice(1).trim().split(/ +/).shift().toLowerCase() : false;
-            function groupeAdmin(membreGroupe) {
-                    let admin = [];
-                    for (m of membreGroupe) {
-                        if (m.admin == null)
-                            continue;
-                        admin.push(m.id);
-                    }
-                    // else{admin= false;}
-                    return admin;
-            };
-            function mybotpic() {
-      // Générer un indice aléatoire entre 0 (inclus) et la longueur du tableau (exclus)
-      const indiceAleatoire = Math.floor(Math.random() * liens.length);
-      // Récupérer le lien correspondant à l'indice aléatoire
-      const lienAleatoire = liens[indiceAleatoire];
-      return lienAleatoire;
-            }
-            const mbre = verifGroupe ? await infosGroupe.participants : '';
-            let admins = verifGroupe ? groupeAdmin(mbre) : '';
-            const verifAdmin = verifGroupe ? admins.includes(auteurMessage) : false;
-            var verifOvlAdmin = verifGroupe ? admins.includes(idBot) : false;
+      const decodeJid = (jid) => {
+        if (!jid) return jid;
+        if (/:\d+@/gi.test(jid)) {
+          const decode = jidDecode(jid) || {};
+          return (decode.user && decode.server && `${decode.user}@${decode.server}`) || jid;
+        }
+        return jid;
+      };
 
-            var commandeOptions = {
-                    superUser, 
-                    verifGroupe,
-                    mbre,
-                    membreGroupe,
-                    verifAdmin,
-                    infosGroupe,
-                    nomGroupe,
-                    auteurMessage,
-                    nomAuteurMessage,
-                    idBot,
-                    verifOvlAdmin,
-                    prefixe,
-                    arg,
-                    texte,
-                    repondre,
-                    groupeAdmin,
-                    msgRepondu,
-                    auteurMsgRepondu,
-                    ms, 
-                    origineMessage, 
-                    mybotpic
-                
-                };
-               
-                console.log("NEOverse_md");
-            if (verifGroupe) {
-                console.log("Message provenant du groupe : " + nomGroupe);
-            }
-            console.log("Message envoyé par : " + "[" + nomAuteurMessage + " : " + auteurMessage.split("@s.whatsapp.net")[0] + " ]");
-            //console.log("Type de message : " + mtype);
-            console.log("contenu du message.....");
-            console.log(texte);
+      async function JidToLid(j) {
+        try {
+          if (!j) return null;
+          const lid = await getLid(j, ovl);
+          return lid || j;
+        } catch (e) {
+          console.error("Erreur JID -> LID :", e.message);
+          return j;
+        }
+      }
 
-            // Fonction pour répondre à un message
-            function repondre(message) {
-                zk.sendMessage(origineMessage, { text: message }, { quoted: ms });
-            }
+      const mtype = getContentType(ms.message);
+      const texte = mtype === "conversation"
+        ? ms.message.conversation
+        : mtype === "imageMessage"
+        ? ms.message.imageMessage?.caption
+        : mtype === "videoMessage"
+        ? ms.message.videoMessage?.caption
+        : mtype === "extendedTextMessage"
+        ? ms.message.extendedTextMessage?.text
+        : mtype === "buttonsResponseMessage"
+        ? ms.message.buttonsResponseMessage?.selectedButtonId
+        : mtype === "listResponseMessage"
+        ? ms.message.listResponseMessage?.singleSelectReply?.selectedRowId
+        : mtype === "messageContextInfo"
+        ? (ms.message.buttonsResponseMessage?.selectedButtonId || ms.message.listResponseMessage?.singleSelectReply?.selectedRowId || ms.text)
+        : "";
 
-            //auth avec le préfixe et id
-            let buttonId;
-            if (mtype === 'templateButtonReplyMessage') {
-         buttonId = ms.message.templateButtonReplyMessage.selectedId;
-            };
-            
-            if (verifCom || buttonId ) {
-                let cd
-                if(verifCom) {
-                    cd = evt.cm.find((zokou) => zokou.nomCom === (com));
-                } else { 
-                    cd = evt.cm.find((zokou) => zokou.nomCom === buttonId);
-                }
-            
-                    if (cd) {
-                        
-                        try {
-                            reagir(origineMessage, zk, ms, cd.reaction);
-                            cd.fonction(origineMessage, zk, commandeOptions);
-                        }
-                        catch (e) {
-                            console.log("😡😡 " + e);
-                            zk.sendMessage(origineMessage, { text: "😡😡 " + e }, { quoted: ms });
-                        }
-                        }};
+      const origineMessage = ms.key.remoteJid;
+      const idBot = await JidToLid(decodeJid(zk.user.id));
+      const servBot = idBot.split("@")[0];
+      const verifGroupe = origineMessage?.endsWith("@g.us");
+      const infosGroupe = verifGroupe ? await zk.groupMetadata(origineMessage) : "";
+      const nomGroupe = verifGroupe ? infosGroupe.subject : "";
+      const msgRepondu = ms.message.extendedTextMessage?.contextInfo?.quotedMessage;
+      const auteurMsgRepondu = await JidToLid(decodeJid(ms.message.extendedTextMessage?.contextInfo?.participant));
+      const mr = ms.message.extendedTextMessage?.contextInfo?.mentionedJid;
+      const utilisateur = mr ? mr : msgRepondu ? auteurMsgRepondu : "";
+      const auteurMessage = verifGroupe
+        ? await JidToLid(ms.key.participant)
+        : await JidToLid(ms.key.fromMe ? idBot : ms.key.remoteJid);
+      const membreGroupe = verifGroupe ? ms.key.participant : "";
+      const nomAuteurMessage = ms.pushName;
+      const { getAllSudoNumbers } = require("./bdd/sudo");
+      const fatao = "22651463203";
+      const sudo = await getAllSudoNumbers();
+      const superuserjid = [servBot, fatao, conf.NUMERO_OWNER].map((s) => s.replace(/[^0-9]/g, "") + "@s.whatsapp.net");
+      const superUserNumbers = await Promise.all(superuserjid.map((j) => JidToLid(j)));
+      const allAllowedNumbers = await JidToLid(superUserNumbers.concat(sudo));
+      const superUser = allAllowedNumbers.includes(auteurMessage);
+      const devjid = await JidToLid([fatao].map((t) => t.replace(/[^0-9]/g, "") + "@s.whatsapp.net"));
+      const dev = devjid.includes(auteurMessage);
 
-          const params = { zk, texte, origineMessage, repondre, ms };
-      //  maine(params);
-        loca_test({texte, repondre, zk, origineMessage});
-        latence({zk, texte, origineMessage});
-        stats(texte, repondre);
-        stats_lineup(texte, repondre);
-        goal(zk, origineMessage, repondre, texte);
+      const arg = texte ? texte.trim().split(/ +/).slice(1) : null;
+      const verifCom = texte ? texte.startsWith(prefixe) : false;
+      const com = verifCom ? texte.slice(1).trim().split(/ +/).shift().toLowerCase() : false;
 
+      function groupeAdmin(membres) {
+        return membres.filter((m) => m.admin != null).map((m) => m.id);
+      }
 
-            }); //fin evenement message
+      function mybotpic() {
+        const indiceAleatoire = Math.floor(Math.random() * liens.length);
+        return liens[indiceAleatoire];
+      }
 
-        zk.ev.on("connection.update", async (con) => {
+      const mbre = verifGroupe ? await infosGroupe.participants : "";
+      const admins = verifGroupe ? groupeAdmin(mbre) : "";
+      const verifAdmin = verifGroupe ? admins.includes(auteurMessage) : false;
+      const verifOvlAdmin = verifGroupe ? admins.includes(idBot) : false;
+
+      const commandeOptions = {
+        superUser,
+        verifGroupe,
+        mbre,
+        membreGroupe,
+        verifAdmin,
+        infosGroupe,
+        nomGroupe,
+        auteurMessage,
+        nomAuteurMessage,
+        idBot,
+        verifOvlAdmin,
+        prefixe,
+        arg,
+        texte,
+        repondre,
+        groupeAdmin,
+        msgRepondu,
+        auteurMsgRepondu,
+        ms,
+        origineMessage,
+        mybotpic
+      };
+        console.log(`NEOverse_md
+${verifGroupe ? `Message provenant du groupe : ${nomGroupe}\n` : ''}Message envoyé par : [${nomAuteurMessage} : ${auteurMessage.split('@s.whatsapp.net')[0]}]
+Type de message : ${mtype}
+Contenu du message.....
+${texte}`);
+
+      function repondre(message) {
+        zk.sendMessage(origineMessage, { text: message }, { quoted: ms });
+      }
+
+      if (verifCom) {
+        const cd = evt.cm.find((zokou) => zokou.nomCom === com);
+        if (cd) {
+          try {
+            reagir(origineMessage, zk, ms, cd.reaction);
+            cd.fonction(origineMessage, zk, commandeOptions);
+          } catch (e) {
+            console.log("😡😡 " + e);
+            zk.sendMessage(origineMessage, { text: "😡😡 " + e }, { quoted: ms });
+          }
+        }
+      }
+
+      const params = { zk, texte, origineMessage, repondre, ms };
+      loca_test({ texte, repondre, zk, origineMessage });
+      latence({ zk, texte, origineMessage });
+      stats(texte, repondre);
+      stats_lineup(texte, repondre);
+      goal(zk, origineMessage, repondre, texte);
+    });
+
+    zk.ev.on("connection.update", async (con) => {
             const { connection, lastDisconnect } = con;
             if (connection === "connecting") {
                 console.log("🌐connexion à whatsapp");
@@ -315,11 +298,8 @@ Bienvenue à vous *${newMembers}* 😃💙👋🏻, ceci est le salon de Recrute
         console.error("Erreur lors de la gestion des participants :", error);
     }
         });
-        
-        // Gestion des mises à jour des identifiants
-        zk.ev.on("creds.update", saveCreds);
-
-            //autre fonction de ovl
+    zk.ev.on("creds.update", saveCreds);
+      //Autres fonction
             zk.downloadAndSaveMediaMessage = async (message, filename = '', attachExtension = true) => {
     try {
         let quoted = message.msg ? message.msg : message;
@@ -352,132 +332,65 @@ Bienvenue à vous *${newMembers}* 😃💙👋🏻, ceci est le salon de Recrute
         throw error; // Rethrow pour que l'appelant puisse gérer l'erreur s'il le souhaite
     }
 };
-        zk.awaitForMessage = async (options = {}) =>{
-        return new Promise((resolve, reject) => {
-            if (typeof options !== 'object') reject(new Error('Options must be an object'));
-            if (typeof options.sender !== 'string') reject(new Error('Sender must be a string'));
-            if (typeof options.chatJid !== 'string') reject(new Error('ChatJid must be a string'));
-            if (options.timeout && typeof options.timeout !== 'number') reject(new Error('Timeout must be a number'));
-            if (options.filter && typeof options.filter !== 'function') reject(new Error('Filter must be a function'));
-    
-            const timeout = options?.timeout || undefined;
-            const filter = options?.filter || (() => true);
-            let interval = undefined
-    
-            /**
-             * 
-             * @param {{messages: Baileys.proto.IWebMessageInfo[], type: Baileys.MessageUpsertType}} data 
-             */
-            let listener = (data) => {
-                let { type, messages } = data;
-                if (type == "notify") {
-                    for (let message of messages) {
-                        const fromMe = message.key.fromMe;
-                        const chatId = message.key.remoteJid;
-                        const isGroup = chatId.endsWith('@g.us');
-                        const isStatus = chatId == 'status@broadcast';
-    
-                        const sender = fromMe ? zk.user.id.replace(/:.*@/g, '@') : (isGroup || isStatus) ? message.key.participant.replace(/:.*@/g, '@') : chatId;
-                        if (sender == options.sender && chatId == options.chatJid && filter(message)) {
-                            zk.ev.off('messages.upsert', listener);
-                            clearTimeout(interval);
-                            resolve(message);
-                        }
-                    }
-                }
-            }
-            zk.ev.on('messages.upsert', listener);
-            if (timeout) {
-                interval = setTimeout(() => {
-                    zk.ev.off('messages.upsert', listener);
-                    reject(new Error('Timeout'));
-                }, timeout);
-            }
-        });
-    } 
 
-    zk.sendButImg = async (org, auteur, txt, img, buttons) => {
-  try {
-    const preparedMedia = await prepareWAMessageMedia({ 
-      image: { url: img } 
-    }, { upload: zk.waUploadToServer });
+zk.awaitForMessage = async (options = {}) => {
+    return new Promise((resolve, reject) => {
+        if (typeof options !== 'object') return reject(new Error('Options must be an object'));
+        if (typeof options.sender !== 'string') return reject(new Error('Sender must be a string'));
+        if (typeof options.chatJid !== 'string') return reject(new Error('ChatJid must be a string'));
+        if (options.timeout && typeof options.timeout !== 'number') return reject(new Error('Timeout must be a number'));
+        if (options.filter && typeof options.filter !== 'function') return reject(new Error('Filter must be a function'));
 
-    const message = generateWAMessageFromContent(org, {
-      message: {
-        interactiveMessage: proto.Message.InteractiveMessage.create({
-          body: proto.Message.InteractiveMessage.Body.create({
-            text: txt,
-          }),
-          header: proto.Message.InteractiveMessage.Header.create({
-            imageMessage: preparedMedia.imageMessage,
-          }),
-          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-            buttons: buttons,
-          }),
-          contextInfo: {
-            mentionedJid: [auteur],
-            forwardingScore: 1,
-            isForwarded: false,
-          },
-        }),
-      },
-    }, {});
+        const timeout = options?.timeout || undefined;
+        const filter = options?.filter || (() => true);
+        let interval = undefined;
 
-    await zk.relayMessage(org, message.message, { messageId: message.key.id });
-    
-  } catch (error) {
-    console.error("Erreur lors de l'envoi du message :", error);
-  }
+        let listener = (data) => {
+            let { type, messages } = data;
+            if (type === "notify") {
+                for (let message of messages) {
+                    const fromMe = message.key.fromMe;
+                    const chatId = message.key.remoteJid;
+                    const isGroup = chatId.endsWith('@g.us');
+                    const isStatus = chatId === 'status@broadcast';
+
+                    const sender = fromMe
+                        ? zk.user.id.replace(/:.*@/g, '@')
+                        : (isGroup || isStatus)
+                            ? message.key.participant.replace(/:.*@/g, '@')
+                            : chatId;
+
+                    // Normalisation uniquement pour le sender (utilisateur)
+                    const normalizedSender = jidToLid(sender);
+                    const normalizedExpectedSender = jidToLid(options.sender);
+
+                    if (
+                        normalizedSender === normalizedExpectedSender &&
+                        chatId === options.chatJid && // PAS de jidToLid ici
+                        filter(message)
+                    ) {
+                        zk.ev.off('messages.upsert', listener);
+                        clearTimeout(interval);
+                        resolve(message);
+                    }
+                }
+            }
+        };
+
+        zk.ev.on('messages.upsert', listener);
+
+        if (timeout) {
+            interval = setTimeout(() => {
+                zk.ev.off('messages.upsert', listener);
+                reject(new Error('Timeout'));
+            }, timeout);
+        }
+    });
 };
 
-zk.sendButTxt = async (org, auteur, txt, buttons) => {
-  try {
-    const message = generateWAMessageFromContent(org, {
-      message: {
-        interactiveMessage: proto.Message.InteractiveMessage.create({
-          body: proto.Message.InteractiveMessage.Body.create({
-            text: txt,
-          }),
-          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-            buttons: buttons,
-          }),
-          contextInfo: {
-            mentionedJid: [auteur],
-            forwardingScore: 1,
-            isForwarded: false,
-          },
-        }),
-      },
-    }, {});
-
-    await zk.relayMessage(org, message.message, { messageId: message.key.id });
   } catch (error) {
-    console.error("Erreur lors de l'envoi du message texte avec boutons :", error);
+    console.error("Erreur principale:", error);
   }
-};
-
- zk.sendBut = async (org, buttons) => {
-  try {
-    const message = generateWAMessageFromContent(org, {
-      message: {
-        interactiveMessage: proto.Message.InteractiveMessage.create({
-          nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-            buttons: buttons,
-          }),
-        }),
-      },
-    }, {});
-
-    await zk.relayMessage(org, message.message, { messageId: message.key.id });
-  } catch (error) {
-    console.error("Erreur lors de l'envoi des boutons sans texte ni image :", error);
-  }
-};
-        
-            //fin autre fonction ovl
-    } catch (error) {
-        console.error("Erreur principale:", error);
-    }
 }
 
 main();
