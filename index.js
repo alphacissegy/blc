@@ -335,58 +335,67 @@ Bienvenue à vous *${newMembers}* 😃💙👋🏻, ceci est le salon de Recrute
 };
 
 zk.awaitForMessage = async (options = {}) => {
-    return new Promise((resolve, reject) => {
-        if (typeof options !== 'object') return reject(new Error('Options must be an object'));
-        if (typeof options.sender !== 'string') return reject(new Error('Sender must be a string'));
-        if (typeof options.chatJid !== 'string') return reject(new Error('ChatJid must be a string'));
-        if (options.timeout && typeof options.timeout !== 'number') return reject(new Error('Timeout must be a number'));
-        if (options.filter && typeof options.filter !== 'function') return reject(new Error('Filter must be a function'));
+  return new Promise((resolve, reject) => {
+    if (typeof options !== 'object') return reject(new Error('Options must be an object'));
+    if (typeof options.sender !== 'string') return reject(new Error('Sender must be a string'));
+    if (typeof options.chatJid !== 'string') return reject(new Error('ChatJid must be a string'));
+    if (options.timeout && typeof options.timeout !== 'number') return reject(new Error('Timeout must be a number'));
+    if (options.filter && typeof options.filter !== 'function') return reject(new Error('Filter must be a function'));
 
-        const timeout = options?.timeout || undefined;
-        const filter = options?.filter || (() => true);
-        let interval = undefined;
+    const timeout = options.timeout || undefined;
+    const filter = options.filter || (() => true);
+    let timeoutId;
 
-        let listener = (data) => {
-            let { type, messages } = data;
-            if (type === "notify") {
-                for (let message of messages) {
-                    const fromMe = message.key.fromMe;
-                    const chatId = message.key.remoteJid;
-                    const isGroup = chatId.endsWith('@g.us');
-                    const isStatus = chatId === 'status@broadcast';
+    // listener async pour gérer await dans son corps
+    const listener = async (data) => {
+      try {
+        const { type, messages } = data;
+        if (type === "notify") {
+          for (let message of messages) {
+            const fromMe = message.key.fromMe;
+            const chatId = message.key.remoteJid;
+            const isGroup = chatId.endsWith('@g.us');
+            const isStatus = chatId === 'status@broadcast';
 
-                    const sender = fromMe
-                        ? zk.user.id.replace(/:.*@/g, '@')
-                        : (isGroup || isStatus)
-                            ? message.key.participant.replace(/:.*@/g, '@')
-                            : chatId;
+            const sender = fromMe
+              ? zk.user.id.replace(/:.*@/g, '@')
+              : (isGroup || isStatus)
+                ? message.key.participant.replace(/:.*@/g, '@')
+                : chatId;
 
-                    // Normalisation uniquement pour le sender (utilisateur)
-                    const normalizedSender = jidToLid(sender);
-                    const normalizedExpectedSender = jidToLid(options.sender);
+            // Normalisation uniquement pour le sender (utilisateur)
+            const normalizedSender = await getLid(sender, zk);
+            const normalizedExpectedSender = await getLid(options.sender, zk);
 
-                    if (
-                        normalizedSender === normalizedExpectedSender &&
-                        chatId === options.chatJid && // PAS de jidToLid ici
-                        filter(message)
-                    ) {
-                        zk.ev.off('messages.upsert', listener);
-                        clearTimeout(interval);
-                        resolve(message);
-                    }
-                }
-            }
-        };
+            if (
+              normalizedSender === normalizedExpectedSender &&
+              chatId === options.chatJid && // PAS de jidToLid ici
+              filter(message)
+            ) {
+              zk.ev.off('messages.upsert', listener);
+              if (timeoutId) clearTimeout(timeoutId);
+              resolve(message);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        // En cas d'erreur dans le listener, on enlève l'écoute et rejette la promesse
+        zk.ev.off('messages.upsert', listener);
+        if (timeoutId) clearTimeout(timeoutId);
+        reject(error);
+      }
+    };
 
-        zk.ev.on('messages.upsert', listener);
+    zk.ev.on('messages.upsert', listener);
 
-        if (timeout) {
-            interval = setTimeout(() => {
-                zk.ev.off('messages.upsert', listener);
-                reject(new Error('Timeout'));
-            }, timeout);
-        }
-    });
+    if (timeout) {
+      timeoutId = setTimeout(() => {
+        zk.ev.off('messages.upsert', listener);
+        reject(new Error('Timeout'));
+      }, timeout);
+    }
+  });
 };
 
   } catch (error) {
