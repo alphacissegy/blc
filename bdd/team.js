@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const s = require("../set");
+const { getJidFromLid } = require("./cache_jid");
 
 const pool = new Pool({
   connectionString: s.DB,
@@ -36,11 +37,19 @@ async function createTable() {
 }
 createTable();
 
+// Fonction interne pour récupérer le jid à partir du lid
+async function resolveJid(lid) {
+  const jid = await getJidFromLid(lid);
+  if (!jid) throw new Error("JID introuvable pour le lid donné");
+  return jid;
+}
+
 // 📌 Obtenir les données d’un utilisateur
-async function getUserData(id) {
+async function getUserData(lid) {
   const client = await pool.connect();
   try {
-    const res = await client.query("SELECT * FROM team WHERE id = $1", [id]);
+    const jid = await resolveJid(lid);
+    const res = await client.query("SELECT * FROM team WHERE id = $1", [jid]);
     return res.rows[0];
   } catch (err) {
     console.error("❌ Erreur récupération utilisateur:", err);
@@ -51,10 +60,12 @@ async function getUserData(id) {
 }
 
 // 📌 Enregistrement d’un utilisateur (avec ou sans données personnalisées)
-async function saveUser(id, data = {}) {
+async function saveUser(lid, data = {}) {
   const client = await pool.connect();
   try {
-    const result = await client.query("SELECT * FROM team WHERE id = $1", [id]);
+    const jid = await resolveJid(lid);
+
+    const result = await client.query("SELECT * FROM team WHERE id = $1", [jid]);
     if (result.rows.length > 0) {
       return "⚠️ Ce joueur est déjà enregistré.";
     }
@@ -78,7 +89,7 @@ async function saveUser(id, data = {}) {
       `INSERT INTO team 
         (id, users, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
-      [id, users, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel]
+      [jid, users, team, points_jeu, rank, argent, puissance, classement, wins, loss, draws, championnats, nel]
     );
 
     return "✅ Joueur enregistré avec succès.";
@@ -91,10 +102,11 @@ async function saveUser(id, data = {}) {
 }
 
 // 📌 Suppression d’un utilisateur
-async function deleteUser(id) {
+async function deleteUser(lid) {
   const client = await pool.connect();
   try {
-    const result = await client.query("DELETE FROM team WHERE id = $1 RETURNING *", [id]);
+    const jid = await resolveJid(lid);
+    const result = await client.query("DELETE FROM team WHERE id = $1 RETURNING *", [jid]);
     if (result.rowCount > 0) {
       return "✅ Joueur supprimé avec succès.";
     }
@@ -108,15 +120,17 @@ async function deleteUser(id) {
 }
 
 // 📌 Mise à jour des champs de l’utilisateur
-async function updateUser(id, updates) {
+async function updateUser(lid, updates) {
   const client = await pool.connect();
   try {
+    const jid = await resolveJid(lid);
+
     const keys = Object.keys(updates);
     const values = Object.values(updates);
     if (keys.length === 0) return "⚠️ Aucun champ à mettre à jour.";
 
     const setQuery = keys.map((key, i) => `${key} = $${i + 2}`).join(", ");
-    await client.query(`UPDATE team SET ${setQuery} WHERE id = $1`, [id, ...values]);
+    await client.query(`UPDATE team SET ${setQuery} WHERE id = $1`, [jid, ...values]);
 
     return "✅ Données mises à jour avec succès.";
   } catch (error) {
