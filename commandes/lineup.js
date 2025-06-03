@@ -8,7 +8,7 @@ zokou(
   },
   async (dest, zk, commandeOptions) => {
     const { repondre, arg, auteurMessage } = commandeOptions;
-    const userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteurMessage;
+    const userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`) || auteurMessage;
     const data = await getUserData(userId);
     if (!data) return repondre("⚠️ Joueur introuvable.");
 
@@ -75,7 +75,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent enregistrer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
     if (!mention || arg.length < 2) {
       return repondre("⚠️ Mentionne un utilisateur et ajoute son nom.");
     }
@@ -95,7 +95,7 @@ zokou(
     const { repondre, arg, superUser } = commandeOptions;
     if (!superUser) return repondre("⚠️ Seuls les membres de la NS peuvent supprimer un joueur.");
 
-    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const mention = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
     if (!mention) {
       return repondre("⚠️ Mentionne un utilisateur à supprimer.");
     }
@@ -110,7 +110,7 @@ async function stats_lineup(tex, repondre) {
   const texte = tex.trim().toLowerCase().split(/\s+/);
 
   if (texte.length === 4 && texte[0].startsWith("@")) {
-    const userId = `${texte[0].replace("@", "")}@s.whatsapp.net`;
+    const userId = `${texte[0].replace("@", "")}@lid`;
     const joueurKey = texte[1].toLowerCase();
 
     if (!/^j\d+$/.test(joueurKey)) return null;
@@ -128,7 +128,7 @@ async function stats_lineup(tex, repondre) {
   }  
 
   else if (texte.length === 2 && texte[1] === "reset_stats" && texte[0].startsWith("@")) {
-    const userId = texte[0].replace("@", "") + "@s.whatsapp.net";
+    const userId = texte[0].replace("@", "") + "@lid";
     const resetMessage = await resetStats(userId);
     return repondre(resetMessage);
   } 
