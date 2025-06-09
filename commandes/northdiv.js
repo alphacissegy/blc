@@ -138,7 +138,7 @@ async function updatePlayerData(updates, client, data_id) {
 
 //add_fiche(nom_joueur, data_id, image_oc)
 add_fiche('northdamian👤', '1', 'https://files.catbox.moe/6ywtez.jpg');
-//add_fiche('northlily👤', '2', 'https://files.catbox.moe/lnd2qg.jpg');
+add_fiche('northlily👤', '2', 'https://files.catbox.moe/lnd2qg.jpg');
 //add_fiche('northadorieru👤', '3', 'https://telegra.ph/file/33d75752a2f4d645f836a.jpg');
 //add_fiche('norththanatos👤', '4', 'https://files.catbox.moe/i0zsrp.jpg');
 add_fiche('northkazuta👤', '5', 'https://files.catbox.moe/9fv70i.jpg');
