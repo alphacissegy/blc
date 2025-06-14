@@ -1,7 +1,3 @@
-const fs = require('fs-extra');
-const { Sequelize } = require('sequelize');
-const path = require("path");
-
 module.exports = { 
     SESSION_ID: process.env.SESSION_ID || 'zokk',
     PREFIXE: process.env.PREFIXE || "/",            
@@ -11,10 +7,3 @@ module.exports = {
     NUMERO_OWNER : process.env.NUMERO_OWNER || "22651463203",
     WELCOME: process.env.WELCOME || 'oui',
 };
-let fichier = require.resolve(__filename);
-fs.watchFile(fichier, () => {
-    fs.unwatchFile(fichier);
-    console.log(`mise à jour ${__filename}`);
-    delete require.cache[fichier];
-    require(fichier);
-});
