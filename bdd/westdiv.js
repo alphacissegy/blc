@@ -114,7 +114,7 @@ async function transferDivisionToAllStars(tableSourceName) {
 }
 
 async function transferAllDivisions() {
-await createAllStarsDivsFichesTable(); // s'assure que la table existe
+  await createAllStarsDivsFichesTable();
 
   const divisions = ['westdiv', 'northdiv', 'centraldiv', 'eastdiv'];
   for (const tableName of divisions) {
@@ -122,4 +122,9 @@ await createAllStarsDivsFichesTable(); // s'assure que la table existe
   }
 }
 
-await transferAllDivisions();
+// 👇 Point d'entrée
+async function main() {
+  await transferAllDivisions();
+}
+
+main();
