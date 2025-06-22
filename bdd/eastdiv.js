@@ -55,4 +55,4 @@ async function renameColumns() {
   }
 }
 
-renameColumns();
+//renameColumns();
