@@ -12,6 +12,46 @@ const proConfig = {
 
 const pool = new Pool(proConfig);
 
+async function createAllStarsDivsFichesTable() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS allstars_divs_fiches (
+        id SERIAL PRIMARY KEY,
+        pseudo TEXT DEFAULT 'aucun',
+        division TEXT DEFAULT 'aucun',
+        classe TEXT DEFAULT 'aucun',
+        rang TEXT DEFAULT 'aucun',
+        golds INTEGER DEFAULT 0,
+        neocoins INTEGER DEFAULT 0,
+        gift_box INTEGER DEFAULT 0,
+        coupons INTEGER DEFAULT 0,
+        np INTEGER DEFAULT 0,
+        talent INTEGER DEFAULT 0,
+        talent2 INTEGER DEFAULT 0,
+        victoires INTEGER DEFAULT 0,
+        defaites INTEGER DEFAULT 0,
+        trophees INTEGER DEFAULT 0,
+        tos INTEGER DEFAULT 0,
+        awards INTEGER DEFAULT 0,
+        cards TEXT DEFAULT 'aucun',
+        globes INTEGER DEFAULT 0,
+        pos TEXT DEFAULT 'aucun',
+        force INTEGER DEFAULT 0,
+        close_combat INTEGER DEFAULT 0,
+        precision INTEGER DEFAULT 0,
+        speed INTEGER DEFAULT 0,
+        source TEXT DEFAULT 'inconnu'
+      );
+    `);
+    console.log("✅ Table allstars_divs_fiches créée avec succès");
+  } catch (error) {
+    console.error("❌ Erreur création allstars_divs_fiches :", error);
+  } finally {
+    client.release();
+  }
+}
+
 async function transferDivisionToAllStars(tableSourceName) {
   const client = await pool.connect();
   try {
@@ -74,6 +114,7 @@ async function transferDivisionToAllStars(tableSourceName) {
 }
 
 async function transferAllDivisions() {
+await createAllStarsDivsFichesTable(); // s'assure que la table existe
 
   const divisions = ['westdiv', 'northdiv', 'centraldiv', 'eastdiv'];
   for (const tableName of divisions) {
