@@ -122,4 +122,4 @@ await createAllStarsDivsFichesTable(); // s'assure que la table existe
   }
 }
 
-transferAllDivisions();
+await transferAllDivisions();
