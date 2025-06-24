@@ -22,8 +22,13 @@ async function addSerialPrimaryKey() {
     if (result.rowCount === 0) {
       console.log("➕ Colonne 'id' absente. Ajout en cours...");
 
-      await pool.query(`ALTER TABLE allstars_divs_fiches ADD COLUMN id SERIAL PRIMARY KEY;`);
-      console.log("✅ Colonne 'id' ajoutée avec succès.");
+      // Étape 1 : Ajouter colonne sans clé primaire
+      await pool.query(`ALTER TABLE allstars_divs_fiches ADD COLUMN id SERIAL;`);
+
+      // Étape 2 : Définir comme PRIMARY KEY si pas déjà défini
+      await pool.query(`ALTER TABLE allstars_divs_fiches ADD PRIMARY KEY (id);`);
+
+      console.log("✅ Colonne 'id' ajoutée avec succès comme PRIMARY KEY.");
     } else {
       console.log("✅ Colonne 'id' existe déjà.");
     }
